@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Glowstore — Belanja Natural Indonesia</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;-moz-user-select:none;user-select:none}
+input,textarea{-webkit-user-select:text;-moz-user-select:text;user-select:text}
+img{-webkit-user-drag:none;user-drag:none}
+.hero-img,.promo-img,.range-img,.auth-left img{-webkit-touch-callout:none;pointer-events:none}
+.cat-img{-webkit-touch-callout:none}
+.product-img,.cart-item-img,.order-item-img,.detail-img{-webkit-touch-callout:none;-webkit-user-drag:none}
+
+/* ===== SHARE DROPDOWN ===== */
+.share-btn{background:none;border:none;cursor:pointer;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#aaa;transition:all 0.2s;flex-shrink:0;position:relative;z-index:2}
+.share-btn:hover{background:var(--light-sage);color:var(--green)}
+.share-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:white;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.14);min-width:170px;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all 0.2s;z-index:999}
+.share-dropdown.open{opacity:1;visibility:visible;transform:translateY(0)}
+.share-dropdown-item{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:0.8rem;color:var(--dark);cursor:pointer;transition:background 0.15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;text-align:left}
+.share-dropdown-item:hover{background:var(--light-sage)}
+.share-dropdown-item span:first-child{font-size:1rem;width:20px;text-align:center}
+input,textarea{-webkit-user-select:text;-moz-user-select:text;user-select:text}
+:root{
+  --cream:#FDF0F5;--dark:#2A1520;--green:#9B4D6E;--sage:#C98BA8;
+  --terracotta:#E07DA0;--gold:#C4906A;--light-sage:#FAE8F0;--warm-white:#FFF5F9;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);overflow-x:hidden;max-width:100vw;-webkit-user-select:none;-moz-user-select:none;user-select:none}
+input,textarea{-webkit-user-select:text;-moz-user-select:text;user-select:text}
+img{display:block;max-width:100%}
+
+/* ===== PANEL SYSTEM ===== */
+.panel{position:fixed;inset:0;z-index:300;background:var(--warm-white);display:flex;flex-direction:column;transform:translateY(100%);transition:transform 0.28s ease,visibility 0.28s;visibility:hidden;min-height:100vh;min-height:100dvh}
+.panel.open{transform:translateY(0);visibility:visible}
+.panel-topbar{display:flex;align-items:center;gap:12px;padding:12px 16px;background:white;border-bottom:1px solid rgba(155,77,110,0.1);flex-shrink:0;min-height:56px}
+.panel-back{display:flex;align-items:center;gap:5px;background:none;border:1.5px solid rgba(155,77,110,0.25);border-radius:20px;padding:7px 13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.72rem;color:var(--green);letter-spacing:1px;text-transform:uppercase;transition:all 0.2s;white-space:nowrap;flex-shrink:0}
+.panel-back:hover{background:var(--light-sage);border-color:var(--green)}
+.panel-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--green);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.panel-body{flex:1;overflow-y:scroll;padding:20px 16px calc(20px + env(safe-area-inset-bottom));scrollbar-width:none;-ms-overflow-style:none;max-width:900px;width:100%;align-self:center}
+.panel-body::-webkit-scrollbar{width:0;display:none}
+@media(min-width:768px){
+  .panel-topbar{padding:14px 24px}
+  .panel-body{padding:28px 32px;max-width:960px;margin:0 auto;width:100%}
+  .panel-title{font-size:1.3rem}
+}
+@media(min-width:1024px){
+  .panel-body{padding:32px 48px}
+}
+
+/* ===== AUTH ===== */
+.auth-screen{position:fixed;inset:0;z-index:9999;display:flex;background:var(--cream);transition:opacity 0.4s,visibility 0.4s;overflow:hidden}
+.auth-screen.hidden{opacity:0;pointer-events:none;visibility:hidden}
+.auth-left{flex:1;position:relative;overflow:hidden;display:none}
+@media(min-width:768px){.auth-left{display:block}}
+.auth-left img{width:100%;height:100%;object-fit:cover;filter:saturate(0.85)}
+.auth-left-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(155,77,110,0.65),rgba(42,26,31,0.3));display:flex;flex-direction:column;justify-content:flex-end;padding:48px}
+.auth-left-quote{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:white;line-height:1.2;margin-bottom:10px}
+.auth-left-sub{font-size:0.75rem;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase}
+.auth-right{width:100%;max-width:100%;display:flex;flex-direction:column;justify-content:flex-start;padding:32px 24px 60px;background:var(--warm-white);overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+.auth-right::-webkit-scrollbar{display:none}
+@media(min-width:480px){.auth-right{padding:48px 40px;max-width:460px}}
+.auth-logo{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;letter-spacing:4px;color:var(--green);margin-bottom:4px;display:block}
+.auth-tagline{font-size:0.7rem;color:var(--sage);letter-spacing:2px;text-transform:uppercase;margin-bottom:28px}
+.auth-tabs{display:flex;margin-bottom:22px;border-bottom:2px solid rgba(155,77,110,0.1)}
+.auth-tab{flex:1;padding:10px;text-align:center;font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:#aaa;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.3s}
+.auth-tab.active{color:var(--green);border-bottom-color:var(--green);font-weight:500}
+.auth-form{display:none;flex-direction:column;gap:12px}
+.auth-form.active{display:flex}
+.auth-field{display:flex;flex-direction:column;gap:5px}
+.auth-label{font-size:0.67rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage)}
+.auth-input{padding:12px 14px;border:1.5px solid rgba(155,77,110,0.15);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--dark);background:white;outline:none;transition:border-color 0.3s;width:100%}
+.auth-input:focus{border-color:var(--green)}
+.auth-input.error{border-color:var(--terracotta)}
+.auth-error{font-size:0.72rem;color:var(--terracotta);display:none}
+.auth-error.show{display:block}
+.auth-btn{background:var(--green);color:white;border:none;padding:16px;border-radius:30px;font-size:0.82rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.3s;margin-top:8px;width:100%;position:relative;z-index:2;-webkit-tap-highlight-color:rgba(0,0,0,0.1)}
+.auth-btn:active{transform:scale(0.97)}
+.auth-btn:hover{background:var(--terracotta)}
+.auth-switch{text-align:center;font-size:0.8rem;color:#aaa;margin-top:4px}
+.auth-switch a{color:var(--green);cursor:pointer;text-decoration:underline}
+.auth-success{position:absolute;inset:0;z-index:2;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:16px;background:var(--warm-white)}
+.auth-success.show{display:flex}
+
+/* ===== NAVBAR ===== */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(253,240,245,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(155,77,110,0.1);gap:8px}
+@media(min-width:768px){nav{padding:14px 32px}}
+@media(min-width:1024px){nav{padding:16px 48px}}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;letter-spacing:2px;color:var(--green);text-decoration:none;flex-shrink:0}
+@media(min-width:480px){.nav-logo{font-size:1.6rem;letter-spacing:3px}}
+@media(min-width:768px){.nav-logo{font-size:1.8rem;letter-spacing:4px}}
+
+/* Desktop nav links */
+.nav-links{display:none !important}
+.nav-links a{text-decoration:none;color:var(--dark);font-size:0.78rem;letter-spacing:2px;text-transform:uppercase;font-weight:500;transition:color 0.3s;cursor:pointer}
+.nav-links a:hover{color:var(--green)}
+
+/* Nav action buttons */
+.nav-actions{display:flex;gap:4px;align-items:center;flex-shrink:0}
+/* Mobile: icon-only slim buttons */
+.nav-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;border-radius:50%;border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:1.1rem;color:var(--dark);transition:all 0.25s;white-space:nowrap;min-width:36px;min-height:36px}
+.nav-btn:hover{color:var(--green);background:var(--light-sage)}
+/* On desktop: show as pill buttons with labels */
+@media(min-width:768px){
+  .nav-btn{padding:8px 14px;border-radius:24px;border:1.5px solid rgba(155,77,110,0.2);font-size:0.72rem;gap:6px}
+  .nav-btn:hover{border-color:var(--green);background:var(--light-sage)}
+}
+.nav-btn-label{display:none}
+@media(min-width:768px){.nav-btn-label{display:inline}}
+.nav-badge{background:linear-gradient(135deg,var(--terracotta),#c4607a);color:white;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.58rem;font-weight:700;flex-shrink:0;box-shadow:0 2px 6px rgba(224,125,160,0.5)}
+@media(min-width:768px){.nav-badge{width:18px;height:18px;font-size:0.62rem}}
+.nav-avatar{width:22px;height:22px;border-radius:50%;background:var(--green);color:white;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;flex-shrink:0}
+@media(min-width:768px){.nav-avatar{width:24px;height:24px;font-size:0.68rem}}
+
+/* Hamburger - mobile only */
+.nav-hamburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;border:none;border-radius:8px;background:none;cursor:pointer;padding:7px;flex-shrink:0}
+.nav-hamburger span{width:100%;height:2px;background:var(--green);border-radius:2px;transition:all 0.3s}
+@media(min-width:1024px){.nav-hamburger{display:none}}
+
+/* Mobile drawer */
+.mobile-drawer{position:fixed;top:0;left:0;width:280px;max-width:85vw;height:100vh;background:var(--warm-white);z-index:300;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;box-shadow:8px 0 40px rgba(0,0,0,0.15)}
+.mobile-drawer.open{transform:translateX(0)}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:299;opacity:0;visibility:hidden;transition:all 0.3s}
+.drawer-overlay.open{opacity:1;visibility:visible}
+.drawer-top{padding:20px 20px 16px;border-bottom:1px solid rgba(155,77,110,0.08);display:flex;align-items:center;justify-content:space-between}
+.drawer-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;letter-spacing:3px;color:var(--green)}
+.drawer-close{background:none;border:none;font-size:1.4rem;color:var(--dark);cursor:pointer;padding:4px;line-height:1}
+.drawer-links{padding:20px 0;flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+.drawer-links::-webkit-scrollbar{display:none}
+.drawer-link{display:flex;align-items:center;gap:12px;padding:14px 20px;font-size:0.9rem;letter-spacing:1px;text-transform:uppercase;color:var(--dark);cursor:pointer;transition:background 0.2s;border-bottom:1px solid rgba(155,77,110,0.05)}
+.drawer-link:hover{background:var(--light-sage);color:var(--green)}
+.drawer-link-icon{font-size:1.1rem;width:24px;text-align:center}
+.drawer-bottom{padding:16px 20px;border-top:1px solid rgba(155,77,110,0.08)}
+.drawer-bottom p{font-size:0.72rem;color:#aaa;text-align:center}
+
+/* ===== HERO ===== */
+.hero{display:grid;grid-template-columns:1fr;overflow:hidden}
+@media(min-width:768px){.hero{grid-template-columns:1fr 1fr;align-items:stretch;overflow:hidden}}
+.hero-left{display:flex;flex-direction:column;justify-content:center;padding:32px 20px;order:2;background:var(--cream)}
+@media(min-width:480px){.hero-left{padding:40px 28px}}
+@media(min-width:768px){.hero-left{padding:48px 44px 48px 40px;order:1}}
+@media(min-width:1024px){.hero-left{padding:56px 52px 56px 48px}}
+.hero-tag{font-size:0.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--sage);margin-bottom:14px}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,8vw,5rem);font-weight:300;line-height:1.05;color:var(--green);margin-bottom:16px}
+.hero-title em{font-style:italic;color:var(--terracotta)}
+.hero-desc{font-size:0.88rem;line-height:1.8;color:#5A5A4A;max-width:420px;margin-bottom:28px}
+.hero-cta{display:flex;gap:14px;align-items:center;margin-bottom:36px;flex-wrap:wrap}
+.btn-primary{background:var(--green);color:var(--cream);padding:13px 28px;border:none;border-radius:40px;font-size:0.78rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.3s;text-decoration:none;display:inline-block}
+.btn-primary:hover{background:var(--terracotta);transform:translateY(-2px)}
+.btn-outline{color:var(--green);font-size:0.78rem;letter-spacing:1px;text-decoration:none;border-bottom:1px solid var(--green);padding-bottom:2px;transition:all 0.3s;background:none;border-top:none;border-left:none;border-right:none;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-outline:hover{color:var(--terracotta);border-color:var(--terracotta)}
+.hero-stats{display:flex;gap:28px;padding-top:24px;border-top:1px solid rgba(155,77,110,0.15);flex-wrap:wrap}
+@media(min-width:480px){.hero-stats{gap:40px}}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--green)}
+@media(min-width:768px){.stat-num{font-size:2rem}}
+.stat-label{font-size:0.65rem;color:#888;letter-spacing:1px;margin-top:2px}
+.hero-right{position:relative;overflow:hidden;aspect-ratio:16/9;order:1}
+@media(min-width:768px){.hero-right{aspect-ratio:unset;height:100%;overflow:hidden;order:2}}
+.hero-carousel{width:100%;height:100%;position:relative;overflow:hidden;cursor:grab;touch-action:pan-y}
+.hero-carousel:active{cursor:grabbing}
+.hero-slides{display:flex;width:100%;height:100%;transition:transform 0.55s cubic-bezier(0.4,0,0.2,1)}
+.hero-slide{flex:0 0 100%;width:100%;height:100%;position:relative;overflow:hidden}
+.hero-img{width:100%;height:100%;object-fit:cover;filter:saturate(0.9);pointer-events:none}
+.hero-badge{position:absolute;bottom:30px;left:0;background:var(--cream);padding:12px 16px;border-radius:0 8px 8px 0;box-shadow:6px 6px 28px rgba(0,0,0,0.12);cursor:pointer;opacity:0;transform:translateX(-20px);transition:opacity 0.4s ease,transform 0.4s ease}
+@media(min-width:768px){.hero-badge{bottom:44px;padding:16px 20px}}
+.hero-badge:hover{transform:translateX(4px)!important}
+.badge-title{font-family:'Cormorant Garamond',serif;font-size:0.9rem;font-weight:600;color:var(--green);margin-bottom:2px}
+@media(min-width:768px){.badge-title{font-size:1rem}}
+.badge-sub{font-size:0.6rem;color:var(--sage);letter-spacing:1px}
+.badge-price{font-size:1rem;font-weight:500;color:var(--terracotta);margin-top:4px}
+@media(min-width:768px){.badge-price{font-size:1.15rem}}
+.hero-label{position:absolute;top:16px;right:12px;background:linear-gradient(135deg,var(--terracotta),#9B4D6E);color:white;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.5rem;letter-spacing:1px;text-transform:uppercase;line-height:1.3;animation:spin 20s linear infinite;box-shadow:0 4px 16px rgba(224,125,160,0.5)}
+@media(min-width:768px){.hero-label{top:48px;right:20px;width:66px;height:66px;font-size:0.58rem;box-shadow:0 6px 20px rgba(224,125,160,0.5)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.carousel-btn{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(253,246,240,0.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--green);z-index:5;transition:all 0.25s;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+@media(min-width:768px){.carousel-btn{width:38px;height:38px;font-size:1.1rem}}
+.carousel-btn:hover{background:var(--green);color:white}
+.carousel-btn.prev{left:8px}
+.carousel-btn.next{right:8px}
+.carousel-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5}
+.carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.45);border:none;cursor:pointer;transition:all 0.3s;padding:0}
+.carousel-dot.active{background:white;width:18px;border-radius:3px}
+
+/* ===== MARQUEE ===== */
+.marquee-wrap{background:linear-gradient(90deg,#7a2d52,var(--green),#c4607a,var(--green),#7a2d52);background-size:300% 100%;animation:marquee-bg 8s ease infinite;padding:11px 0;overflow:hidden;position:relative}
+.marquee-wrap::before,.marquee-wrap::after{content:'';position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none}
+.marquee-wrap::before{left:0;background:linear-gradient(to right,rgba(155,77,110,0.6),transparent)}
+.marquee-wrap::after{right:0;background:linear-gradient(to left,rgba(155,77,110,0.6),transparent)}
+.marquee-track{display:flex;white-space:nowrap;animation:marquee 22s linear infinite}
+.marquee-item{font-family:'Cormorant Garamond',serif;font-size:0.9rem;color:var(--cream);letter-spacing:3px;padding:0 28px;opacity:0.9;font-style:italic;text-shadow:0 1px 8px rgba(255,200,220,0.3)}
+@media(min-width:768px){.marquee-item{font-size:0.98rem;padding:0 36px}}
+.marquee-dot{color:var(--gold);font-style:normal;filter:drop-shadow(0 0 4px rgba(196,144,106,0.8))}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes marquee-bg{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+/* ===== SECTIONS ===== */
+.section{padding:48px 16px}
+@media(min-width:480px){.section{padding:56px 24px}}
+@media(min-width:768px){.section{padding:64px 32px}}
+@media(min-width:1024px){.section{padding:72px 48px}}
+.section-alt{background:var(--warm-white)}
+.section-header{text-align:center;margin-bottom:36px}
+@media(min-width:768px){.section-header{margin-bottom:48px}}
+.section-tag{font-size:0.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--sage);margin-bottom:10px;display:block}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,4vw,2.8rem);font-weight:300;color:var(--green)}
+
+/* ===== SUBCATEGORY MENU ===== */
+.subcat-list{display:flex;flex-direction:column;gap:0;padding:8px 0}
+.subcat-item{display:flex;align-items:center;gap:14px;padding:14px 20px;cursor:pointer;transition:background 0.2s;border-bottom:1px solid rgba(155,77,110,0.1)}
+.subcat-item:hover{background:var(--light-sage)}
+.subcat-thumb{width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(155,77,110,0.15)}
+.subcat-info{flex:1;min-width:0}
+.subcat-name{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--dark);margin-bottom:2px}
+.subcat-count{font-size:0.68rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage)}
+.subcat-arrow{color:var(--sage);font-size:1.1rem;flex-shrink:0}
+.categories-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:600px;margin:0 auto}
+@media(min-width:480px){.categories-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:768px){.categories-grid{grid-template-columns:repeat(5,1fr);gap:14px;max-width:900px}}
+@media(min-width:768px){.cat-card{aspect-ratio:unset;height:220px;max-width:100%}}
+@media(min-width:768px){#categories{padding:28px 32px !important}}
+@media(min-width:1024px){#categories{padding:32px 48px !important}}
+.cat-card{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:3/4;cursor:pointer;transition:transform 0.35s;width:100%}
+.cat-card:hover{transform:translateY(-4px)}
+.cat-img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
+.cat-card:hover .cat-img{transform:scale(1.06)}
+.cat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(42,10,28,0.75) 0%,rgba(155,77,110,0.15) 55%,transparent 100%)}
+.cat-name{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-family:'Cormorant Garamond',serif;font-size:0.95rem;color:white;letter-spacing:1.5px}
+@media(min-width:768px){.cat-name{font-size:1.05rem}}
+.cat-sub{font-size:0.55rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.55);display:block;margin-top:2px}
+
+/* ===== PRODUCTS GRID ===== */
+.products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:640px){.products-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1024px){.products-grid{grid-template-columns:repeat(4,1fr);gap:18px}}
+.product-card{background:white;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform 0.3s,box-shadow 0.3s}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(0,0,0,0.1)}
+.product-img-wrap{position:relative;aspect-ratio:1;overflow:hidden}
+.product-img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
+.product-card:hover .product-img{transform:scale(1.06)}
+.product-badge-tag{position:absolute;top:8px;left:8px;background:linear-gradient(135deg,var(--terracotta),#c4607a);color:white;font-size:0.55rem;letter-spacing:1.5px;padding:3px 9px;border-radius:20px;text-transform:uppercase;box-shadow:0 2px 8px rgba(224,125,160,0.45);font-weight:600}
+.product-info{padding:10px 11px 12px}
+@media(min-width:768px){.product-info{padding:13px 14px 15px}}
+.product-range{font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--sage);margin-bottom:3px}
+.product-name{font-family:'Cormorant Garamond',serif;font-size:0.9rem;color:var(--dark);margin-bottom:7px;line-height:1.2}
+@media(min-width:768px){.product-name{font-size:1rem}}
+.product-footer{display:flex;align-items:center;justify-content:space-between;gap:5px;flex-wrap:nowrap}
+.product-price{font-size:0.8rem;font-weight:500;color:var(--terracotta);min-width:0}
+.product-original{font-size:0.65rem;color:#bbb;text-decoration:line-through;margin-right:2px;display:none}
+@media(min-width:480px){.product-original{display:inline}}
+.product-actions{display:flex;gap:4px;flex-shrink:0}
+.add-btn{background:var(--green);color:white;border:none;width:28px;height:28px;border-radius:50%;font-size:1rem;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center}
+@media(min-width:768px){.add-btn{width:32px;height:32px}}
+.add-btn:hover{background:var(--terracotta);transform:rotate(90deg)}
+.add-btn.added{background:#27ae60;transform:none}
+.beli-btn{background:var(--terracotta);color:white;border:none;padding:0 8px;height:28px;border-radius:14px;font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.25s;white-space:nowrap}
+@media(min-width:768px){.beli-btn{padding:0 10px;height:32px;border-radius:16px;font-size:0.64rem}}
+.beli-btn:hover{background:#a3522e}
+
+
+/* ===== PROMO HERO CAROUSEL ===== */
+.promo-hero-wrap{width:100%;height:100%;position:relative;overflow:hidden;cursor:grab;touch-action:pan-y}
+.promo-hero-wrap:active{cursor:grabbing}
+.promo-hero-track{display:flex;width:100%;height:100%;transition:transform 0.55s cubic-bezier(0.4,0,0.2,1)}
+.promo-hero-slide{flex:0 0 100%;width:100%;height:100%;position:relative;overflow:hidden}
+.promo-hero-wrap .carousel-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5}
+/* ===== PROMO ===== */
+.promo-section{padding:48px 16px;background:#1E0F18}
+@media(min-width:480px){.promo-section{padding:56px 24px}}
+@media(min-width:768px){.promo-section{padding:64px 32px}}
+@media(min-width:1024px){.promo-section{padding:72px 48px}}
+.promo-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:36px}
+@media(min-width:640px){.promo-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.promo-grid{grid-template-columns:repeat(3,1fr);gap:20px;margin-top:44px}}
+.promo-card{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:16/9}
+@media(min-width:640px){.promo-card{aspect-ratio:4/3}}
+.promo-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;filter:brightness(0.85);pointer-events:none;z-index:0}
+.promo-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(20,0,15,0.85) 0%,rgba(20,0,15,0.3) 50%,transparent 100%);z-index:1}
+.promo-content{position:absolute;bottom:20px;left:0;right:0;padding:0 18px;z-index:10}
+@media(min-width:768px){.promo-content{bottom:24px;padding:0 24px}}
+.promo-tag{display:inline-block;font-size:0.62rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;background:linear-gradient(135deg,rgba(224,125,160,0.35),rgba(196,144,106,0.25));border:1px solid rgba(255,180,210,0.7);padding:4px 12px;border-radius:20px;margin-bottom:7px;text-shadow:0 1px 3px rgba(0,0,0,0.4);backdrop-filter:blur(4px);box-shadow:0 2px 12px rgba(224,125,160,0.2)}
+.promo-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:white;margin-bottom:6px}
+@media(min-width:768px){.promo-title{font-size:1.1rem;margin-bottom:8px}}
+.promo-cta{background:white;color:#b45080;border:none;padding:7px 14px;border-radius:20px;font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.25s}
+.promo-cta:hover{background:#b45080;color:white}
+
+/* ===== RANGE SCROLL ===== */
+.range-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;-ms-overflow-style:none}
+.range-scroll::-webkit-scrollbar{display:none}
+.range-card{flex:0 0 140px;border-radius:10px;overflow:hidden;position:relative;cursor:pointer;aspect-ratio:2/3;transition:transform 0.3s}
+@media(min-width:480px){.range-card{flex:0 0 155px}}
+@media(min-width:768px){.range-card{flex:0 0 170px;border-radius:12px}}
+.range-card:hover{transform:scale(1.04)}
+.range-img{width:100%;height:100%;object-fit:cover}
+.range-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(100,30,65,0.85) 0%,rgba(155,77,110,0.3) 50%,transparent 100%)}
+.range-label{position:absolute;bottom:0;left:0;right:0;padding:14px 12px}
+.range-name{font-family:'Cormorant Garamond',serif;font-size:1rem;color:white}
+
+/* ===== SUSTAINABILITY ===== */
+.sustain-section{background:var(--green);padding:48px 16px;text-align:center}
+@media(min-width:480px){.sustain-section{padding:56px 24px}}
+@media(min-width:768px){.sustain-section{padding:72px 48px}}
+.sustain-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:36px}
+@media(min-width:480px){.sustain-grid{grid-template-columns:repeat(3,1fr);gap:18px}}
+@media(min-width:768px){.sustain-grid{gap:28px;margin-top:48px}}
+.sustain-card{padding:24px 20px;border:1px solid rgba(253,246,240,0.12);border-radius:12px;cursor:pointer;transition:all 0.3s;text-align:left}
+@media(min-width:480px){.sustain-card{text-align:center}}
+@media(min-width:768px){.sustain-card{padding:32px 24px}}
+.sustain-card:hover{background:rgba(253,246,240,0.08);transform:translateY(-4px)}
+.sustain-icon{font-size:1.8rem;margin-bottom:10px}
+@media(min-width:768px){.sustain-icon{font-size:2rem;margin-bottom:12px}}
+.sustain-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--cream);margin-bottom:7px}
+@media(min-width:768px){.sustain-title{font-size:1.25rem}}
+.sustain-text{font-size:0.78rem;color:rgba(253,246,240,0.6);line-height:1.7}
+.sustain-cta{font-size:0.65rem;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-top:12px;opacity:0.8}
+.sustain-card:hover .sustain-cta{opacity:1}
+
+/* ===== FOOTER ===== */
+footer{background:#1E0F18;color:rgba(253,246,240,0.65);padding:48px 16px 28px}
+@media(min-width:480px){footer{padding:56px 24px 32px}}
+@media(min-width:768px){footer{padding:72px 48px 36px}}
+.footer-grid{display:grid;grid-template-columns:1fr;gap:32px;margin-bottom:36px}
+@media(min-width:640px){.footer-grid{grid-template-columns:1fr 1fr;gap:40px}}
+@media(min-width:1024px){.footer-grid{grid-template-columns:2fr 1fr 1fr;gap:56px;margin-bottom:48px}}
+.footer-brand-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--cream);letter-spacing:4px;margin-bottom:10px}
+@media(min-width:768px){.footer-brand-name{font-size:1.7rem}}
+.footer-brand-desc{font-size:0.8rem;line-height:1.8;max-width:280px;margin-bottom:18px}
+.footer-socials{display:flex;gap:10px}
+.social-btn{width:36px;height:36px;border-radius:50%;background:rgba(253,246,240,0.1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.25s;color:var(--cream);text-decoration:none}
+.social-btn:hover{background:var(--terracotta)}
+.footer-col-title{font-size:0.66rem;letter-spacing:3px;text-transform:uppercase;color:var(--cream);margin-bottom:14px;font-weight:500}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.footer-col a{text-decoration:none;color:rgba(253,246,240,0.6);font-size:0.8rem;transition:color 0.25s;cursor:pointer}
+.footer-col a:hover{color:var(--cream)}
+.footer-bottom{border-top:1px solid rgba(253,246,240,0.1);padding-top:20px}
+.footer-bottom p{font-size:0.7rem}
+
+/* ===== CART PANEL ===== */
+.cart-layout{display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:900px){.cart-layout{grid-template-columns:1fr 300px;gap:28px;max-width:1100px;margin:0 auto}}
+@media(min-width:1100px){.cart-layout{grid-template-columns:1fr 340px}}
+.cart-items-area{display:flex;flex-direction:column;gap:10px;margin-bottom:0}
+.cart-select-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--light-sage);border-radius:10px}
+.cart-select-label{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:0.82rem;font-weight:500}
+.cart-chk{width:18px;height:18px;border-radius:5px;border:2px solid var(--sage);cursor:pointer;appearance:none;-webkit-appearance:none;background:white;position:relative;transition:all 0.2s;flex-shrink:0}
+.cart-chk:checked{background:var(--green);border-color:var(--green)}
+.cart-chk:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:white;font-size:11px;font-weight:700}
+.cart-item{display:flex;gap:12px;padding:12px;background:white;border-radius:12px;align-items:flex-start;transition:opacity 0.2s}
+.cart-item.deselected{opacity:0.4}
+.cart-item-img{width:64px;height:64px;object-fit:cover;border-radius:8px;flex-shrink:0}
+@media(min-width:768px){.cart-item-img{width:72px;height:72px}}
+.cart-item-info{flex:1;min-width:0}
+.cart-item-name{font-family:'Cormorant Garamond',serif;font-size:0.95rem;margin-bottom:3px}
+.cart-item-price{color:var(--terracotta);font-weight:500;font-size:0.84rem;margin-bottom:7px}
+.cart-item-qty{display:flex;align-items:center;gap:9px}
+.qty-btn{width:26px;height:26px;border-radius:50%;border:1px solid rgba(155,77,110,0.2);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;font-size:0.9rem}
+.qty-btn:hover{background:var(--light-sage)}
+.cart-remove{color:#bbb;cursor:pointer;font-size:0.74rem;background:none;border:none;font-family:'DM Sans',sans-serif;transition:color 0.2s;flex-shrink:0;padding:2px}
+.cart-remove:hover{color:var(--terracotta)}
+.cart-summary-box{background:white;border-radius:14px;padding:20px}
+@media(min-width:900px){.cart-summary-box{position:sticky;top:20px;padding:24px}}
+.cart-summary-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--green);margin-bottom:14px}
+@media(min-width:768px){.cart-summary-title{font-size:1.3rem}}
+.summary-row{display:flex;justify-content:space-between;font-size:0.82rem;color:#888;margin-bottom:8px}
+.summary-total{display:flex;justify-content:space-between;font-size:1rem;font-weight:600;color:var(--green);margin:12px 0;padding-top:12px;border-top:1px solid rgba(155,77,110,0.1)}
+.ig-note{display:flex;align-items:flex-start;gap:9px;background:#fff7f4;border-radius:9px;padding:10px;margin-bottom:12px;border:1px solid rgba(196,103,58,0.15)}
+.ig-note-text{font-size:0.68rem;color:#a05030;line-height:1.5}
+.checkout-btn{width:100%;background:var(--green);color:white;border:none;padding:13px;border-radius:28px;font-size:0.78rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.3s}
+.checkout-btn:hover{background:var(--terracotta)}
+.cart-empty-state{text-align:center;padding:60px 20px;color:#aaa}
+.cart-empty-icon{font-size:3.5rem;opacity:0.2;margin-bottom:12px}
+
+/* ===== SEARCH ===== */
+.search-panel .panel-topbar{padding:10px 14px}
+@media(min-width:768px){.search-panel .panel-topbar{padding:12px 24px}}
+.search-input-row{position:relative;flex:1}
+.search-input{width:100%;border:2px solid rgba(155,77,110,0.15);border-radius:28px;padding:10px 40px 10px 40px;font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--dark);background:white;outline:none;transition:border-color 0.3s}
+.search-input:focus{border-color:var(--green)}
+.search-input-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#aaa;font-size:0.88rem;pointer-events:none}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--light-sage);border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.75rem;transition:background 0.2s}
+.search-clear:hover{background:var(--terracotta);color:white}
+.search-hint{font-size:0.7rem;color:#bbb;letter-spacing:2px;text-transform:uppercase;text-align:center;padding:28px 0 14px}
+
+/* ===== PRODUCT DETAIL ===== */
+.detail-layout{display:grid;grid-template-columns:1fr;gap:24px;max-width:960px;margin:0 auto}
+@media(min-width:640px){.detail-layout{grid-template-columns:1fr 1fr;gap:40px}}
+@media(min-width:1024px){.detail-layout{gap:48px}}
+.detail-img{width:100%;border-radius:14px;object-fit:cover;aspect-ratio:1;max-height:380px}
+@media(min-width:640px){.detail-img{max-height:none}}
+.detail-range{font-size:0.66rem;letter-spacing:3px;text-transform:uppercase;color:var(--sage);margin-bottom:7px}
+.detail-name{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;color:var(--green);margin-bottom:12px;line-height:1.1}
+@media(min-width:768px){.detail-name{font-size:2rem}}
+.detail-price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.detail-price{font-size:1.3rem;font-weight:500;color:var(--terracotta)}
+@media(min-width:768px){.detail-price{font-size:1.5rem}}
+.detail-orig{font-size:0.88rem;color:#bbb;text-decoration:line-through}
+.detail-disc{background:linear-gradient(135deg,var(--terracotta),#c4607a);color:white;font-size:0.68rem;padding:3px 10px;border-radius:20px;box-shadow:0 2px 8px rgba(224,125,160,0.4);font-weight:600}
+.detail-desc{font-size:0.84rem;line-height:1.8;color:#666;margin-bottom:18px}
+.detail-features{display:flex;flex-direction:column;gap:7px;margin-bottom:22px}
+.detail-feature{display:flex;align-items:center;gap:9px;font-size:0.8rem;color:var(--dark)}
+.detail-feat-icon{color:var(--gold)}
+.detail-section{margin-top:22px;margin-bottom:6px}
+.detail-section-title{font-size:0.65rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--sage);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.detail-section-title::after{content:'';flex:1;height:1px;background:rgba(155,77,110,0.15)}
+.detail-howto{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.detail-howto-step{display:flex;gap:10px;align-items:flex-start;font-size:0.82rem;color:#555;line-height:1.55}
+.detail-step-num{min-width:20px;height:20px;border-radius:50%;background:var(--green);color:white;font-size:0.6rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-weight:600}
+.detail-caution{display:flex;flex-direction:column;gap:7px;margin-bottom:4px}
+.detail-caution-item{display:flex;gap:10px;align-items:flex-start;font-size:0.8rem;color:#5a3a3a;line-height:1.55;background:#fff3f6;border-left:3px solid #e07da0;padding:9px 11px;border-radius:0 8px 8px 0}
+.detail-caution-icon{flex-shrink:0}
+.detail-actions{display:flex;gap:8px}
+.detail-actions-bar{flex-shrink:0;display:flex;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:var(--warm-white);border-top:1px solid rgba(155,77,110,0.1)}
+.detail-add{flex:1;background:white;color:var(--green);border:2px solid var(--green);padding:11px;border-radius:28px;font-size:0.74rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.3s}
+.detail-add:hover{background:var(--light-sage)}
+.detail-buy{flex:1;background:var(--terracotta);color:white;border:none;padding:11px;border-radius:28px;font-size:0.74rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.3s}
+.detail-buy:hover{background:#a3522e}
+.detail-wish{width:42px;height:42px;border-radius:50%;border:2px solid rgba(155,77,110,0.2);background:white;cursor:pointer;font-size:1rem;transition:all 0.25s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.detail-wish.active{color:#e74c3c;border-color:#e74c3c}
+.detail-wish:hover{background:#ffe0e0;border-color:#e74c3c}
+
+/* ===== INFO PANEL ===== */
+.info-content{max-width:600px;margin:0 auto}
+.info-icon{font-size:2.5rem;margin-bottom:12px}
+@media(min-width:768px){.info-icon{font-size:3rem;margin-bottom:14px}}
+.info-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:var(--green);margin-bottom:18px;line-height:1.2}
+@media(min-width:768px){.info-title{font-size:2rem;margin-bottom:20px}}
+.info-body{font-size:0.86rem;line-height:1.85;color:#555}
+.info-body h4{font-size:0.92rem;color:var(--dark);margin:18px 0 7px;font-weight:600}
+.info-body ul{padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.info-tag{display:inline-block;background:var(--light-sage);color:var(--sage);font-size:0.64rem;letter-spacing:2px;text-transform:uppercase;padding:4px 11px;border-radius:20px;margin-bottom:12px}
+.info-contact-row{display:flex;align-items:flex-start;gap:13px;padding:12px 0;border-bottom:1px solid rgba(155,77,110,0.07)}
+.info-contact-icon{font-size:1.1rem;width:24px;flex-shrink:0;margin-top:2px}
+.info-contact-label{font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--sage);margin-bottom:2px}
+.info-contact-val{font-size:0.84rem;color:var(--dark)}
+
+/* ===== WISHLIST ===== */
+.wishlist-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(min-width:640px){.wishlist-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1024px){.wishlist-grid{grid-template-columns:repeat(4,1fr);gap:16px}}
+
+/* ===== ACCOUNT PANEL ===== */
+.acc-panel-body{padding:0!important}
+.acc-profile-bar{display:flex;align-items:center;gap:16px;background:var(--green);padding:24px 20px}
+@media(min-width:768px){.acc-profile-bar{padding:28px 28px;gap:18px}}
+.acc-avatar{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.2);border:2px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:white;font-weight:600;flex-shrink:0}
+@media(min-width:768px){.acc-avatar{width:58px;height:58px;font-size:1.7rem}}
+.acc-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:white}
+@media(min-width:768px){.acc-name{font-size:1.4rem}}
+.acc-email{font-size:0.76rem;color:rgba(255,255,255,0.6);margin-top:2px}
+.acc-joined{font-size:0.63rem;color:rgba(255,255,255,0.4);margin-top:2px;letter-spacing:1px;text-transform:uppercase}
+.acc-orders{background:white;padding:18px 16px 20px}
+@media(min-width:768px){.acc-orders{padding:20px 24px 24px}}
+.acc-orders-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+@media(min-width:768px){.acc-orders-header{margin-bottom:20px}}
+.acc-orders-title{font-size:0.95rem;font-weight:600;color:var(--dark)}
+.acc-orders-history{font-size:0.78rem;color:var(--terracotta);cursor:pointer}
+.acc-orders-history:hover{text-decoration:underline}
+.acc-orders-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.acc-order-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:10px;cursor:pointer;transition:background 0.2s;text-align:center}
+.acc-order-item:hover{background:var(--light-sage)}
+.acc-order-icon-wrap{position:relative;display:inline-flex;justify-content:center}
+.acc-order-icon{width:46px;height:46px;border-radius:50%;background:var(--light-sage);display:flex;align-items:center;justify-content:center;color:var(--green)}
+@media(min-width:768px){.acc-order-icon{width:52px;height:52px}}
+.acc-order-badge{position:absolute;top:-4px;right:-4px;background:#e74c3c;color:white;font-size:0.62rem;font-weight:700;min-width:18px;height:18px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid white}
+.acc-order-label{font-size:0.68rem;color:var(--dark);font-weight:500;line-height:1.3}
+@media(min-width:480px){.acc-order-label{font-size:0.74rem}}
+.acc-divider{height:8px;background:var(--cream)}
+.acc-menu-group{background:white}
+.acc-menu-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(155,77,110,0.07);cursor:pointer;transition:all 0.2s}
+@media(min-width:768px){.acc-menu-item{padding:16px 24px;gap:13px}}
+.acc-menu-item:last-child{border-bottom:none}
+.acc-menu-item:hover{background:var(--light-sage)}
+.acc-menu-icon{font-size:1rem;width:22px;text-align:center}
+.acc-menu-label{flex:1;font-size:0.84rem;color:var(--dark)}
+.acc-menu-arrow{font-size:0.9rem;color:#ccc}
+.acc-menu-item.danger .acc-menu-label{color:var(--terracotta)}
+.acc-menu-item.danger:hover{background:#fff4f0}
+
+/* ===== ORDERS ===== */
+.order-card{background:white;border-radius:12px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+.order-card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(155,77,110,0.07)}
+@media(min-width:768px){.order-card-header{padding:14px 18px}}
+.order-id{font-size:0.7rem;color:var(--green);letter-spacing:1px;font-weight:600}
+.order-date{font-size:0.7rem;color:#aaa;margin-top:2px}
+.order-status-badge{font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap}
+@media(min-width:768px){.order-status-badge{font-size:0.64rem;padding:4px 12px}}
+.order-status-badge.belum-bayar{background:#fff3cd;color:#856404}
+.order-status-badge.dikemas{background:#cfe2ff;color:#084298}
+.order-status-badge.dikirim{background:#d1e7dd;color:#0a3622}
+.order-status-badge.penilaian{background:#f3e8ff;color:#5a189a}
+.order-item-row{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(155,77,110,0.05)}
+@media(min-width:768px){.order-item-row{padding:12px 18px;gap:12px}}
+.order-item-row:last-child{border-bottom:none}
+.order-item-img{width:48px;height:48px;border-radius:7px;object-fit:cover;flex-shrink:0}
+@media(min-width:768px){.order-item-img{width:56px;height:56px}}
+.order-item-name{font-family:'Cormorant Garamond',serif;font-size:0.92rem;color:var(--dark);line-height:1.2}
+@media(min-width:768px){.order-item-name{font-size:1rem}}
+.order-item-qty{font-size:0.75rem;color:#aaa;margin-top:2px}
+.order-item-price{font-size:0.84rem;color:var(--terracotta);font-weight:500;margin-left:auto;flex-shrink:0}
+.order-total-row{display:flex;justify-content:space-between;padding:12px 14px;font-size:0.88rem;font-weight:600;color:var(--green);background:var(--light-sage)}
+@media(min-width:768px){.order-total-row{padding:14px 18px}}
+
+/* ===== ORDER PROGRESS ===== */
+.order-progress{display:flex;align-items:flex-start;padding:14px 14px 6px;gap:0}
+@media(min-width:768px){.order-progress{padding:16px 18px 8px}}
+.order-progress-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;z-index:1}
+.ops-circle{width:28px;height:28px;border-radius:50%;border:2px solid #e0e0e0;background:white;display:flex;align-items:center;justify-content:center;font-size:0.7rem;transition:all 0.3s;flex-shrink:0}
+@media(min-width:768px){.ops-circle{width:32px;height:32px;font-size:0.8rem}}
+.ops-circle.done{background:var(--green);border-color:var(--green);color:white}
+.ops-circle.active{background:white;border-color:var(--terracotta);color:var(--terracotta);box-shadow:0 0 0 3px rgba(196,103,58,0.12)}
+.ops-label{font-size:0.55rem;color:#bbb;margin-top:4px;text-align:center;line-height:1.3;max-width:44px}
+@media(min-width:768px){.ops-label{font-size:0.6rem;max-width:52px}}
+.ops-label.done{color:var(--green)}
+.ops-label.active{color:var(--terracotta);font-weight:600}
+.order-progress-connector{flex:1;height:2px;background:#e0e0e0;margin-top:13px;z-index:0;transition:background 0.3s}
+@media(min-width:768px){.order-progress-connector{margin-top:15px}}
+.order-progress-connector.done{background:var(--green)}
+.order-est{font-size:0.7rem;color:var(--sage);padding:2px 14px 12px;font-style:italic;display:flex;align-items:center;gap:5px}
+@media(min-width:768px){.order-est{font-size:0.74rem;padding:2px 18px 14px}}
+.order-courier-box{display:flex;align-items:center;gap:8px;margin:0 14px 0;padding:10px 12px;background:var(--light-sage);border-radius:9px;border-left:3px solid var(--green)}
+@media(min-width:768px){.order-courier-box{margin:0 18px 0;gap:10px}}
+.ocb-label{font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--sage);margin-bottom:2px}
+.ocb-val{font-size:0.8rem;font-weight:500;color:var(--dark)}
+
+/* ===== ORDERS FILTER ===== */
+.orders-filter-wrap{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;margin-bottom:18px;scrollbar-width:none;-ms-overflow-style:none}
+.orders-filter-wrap::-webkit-scrollbar{display:none}
+.orders-ftab{padding:6px 14px;border-radius:20px;border:1.5px solid rgba(155,77,110,0.18);background:none;cursor:pointer;font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;font-family:'DM Sans',sans-serif;color:var(--dark);transition:all 0.2s;white-space:nowrap;flex-shrink:0}
+.orders-ftab.active,.orders-ftab:hover{background:var(--green);color:white;border-color:var(--green)}
+.orders-empty{text-align:center;padding:60px 20px;color:#bbb}
+
+/* ===== FILTER TABS ===== */
+.filter-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+.filter-tab{padding:6px 16px;border-radius:20px;border:1.5px solid rgba(155,77,110,0.2);background:none;cursor:pointer;font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;font-family:'DM Sans',sans-serif;color:var(--dark);transition:all 0.25s}
+.filter-tab.active,.filter-tab:hover{background:var(--green);color:white;border-color:var(--green)}
+
+/* ===== CHECKOUT MODAL ===== */
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:all 0.3s}
+@media(min-width:600px){.modal-overlay{align-items:center}}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal-box{background:var(--warm-white);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:24px 20px 32px;transform:translateY(40px);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);max-height:90vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+.modal-box::-webkit-scrollbar{display:none}
+@media(min-width:600px){.modal-box{border-radius:20px;transform:scale(0.95)}}
+.modal-overlay.open .modal-box{transform:translateY(0)}
+@media(min-width:600px){.modal-overlay.open .modal-box{transform:scale(1)}}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--green);margin-bottom:4px}
+.modal-sub{font-size:0.75rem;color:#aaa;margin-bottom:20px}
+.modal-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.modal-label{font-size:0.67rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage)}
+.modal-input{padding:12px 14px;border:1.5px solid rgba(155,77,110,0.15);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--dark);background:white;outline:none;transition:border-color 0.3s;width:100%}
+.modal-input:focus{border-color:var(--green)}
+.modal-input.error{border-color:var(--terracotta)}
+.modal-order-summary{background:var(--light-sage);border-radius:10px;padding:12px 14px;margin-bottom:18px;font-size:0.8rem;color:var(--dark)}
+.modal-order-summary-title{font-size:0.66rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--sage);margin-bottom:8px}
+.modal-order-row{display:flex;justify-content:space-between;margin-bottom:4px}
+.modal-order-total{display:flex;justify-content:space-between;font-weight:600;color:var(--green);margin-top:8px;padding-top:8px;border-top:1px solid rgba(155,77,110,0.12)}
+.modal-note{display:flex;align-items:flex-start;gap:8px;background:#fff7f4;border-radius:9px;padding:10px;margin-bottom:16px;border:1px solid rgba(196,103,58,0.15);font-size:0.72rem;color:#a05030;line-height:1.5}
+.modal-btn-row{display:flex;gap:10px}
+.modal-btn-cancel{flex:1;background:none;border:1.5px solid rgba(155,77,110,0.2);color:var(--dark);padding:12px;border-radius:28px;font-size:0.76rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.modal-btn-cancel:hover{background:var(--light-sage)}
+.modal-btn-send{flex:2;background:var(--green);color:white;border:none;padding:12px;border-radius:28px;font-size:0.76rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.3s}
+.modal-btn-send:hover{background:var(--terracotta)}
+
+/* ===== TOAST ===== */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--dark);color:white;padding:10px 20px;border-radius:28px;font-size:0.78rem;opacity:0;transition:all 0.35s;z-index:9999;display:flex;align-items:center;gap:8px;white-space:nowrap;pointer-events:none;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-icon{color:#6fcf97;flex-shrink:0}
+
+/* ===== BOTTOM NAV (mobile) ===== */
+.bottom-nav{display:none !important}
+.bottom-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;background:none;border:none;font-family:'DM Sans',sans-serif;color:var(--dark);transition:color 0.2s}
+.bottom-nav-item:hover{color:var(--green)}
+.bottom-nav-icon{font-size:1.25rem;line-height:1}
+.bottom-nav-label{font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;font-weight:500}
+
+/* Extra bottom padding for pages so content not hidden behind bottom nav */
+#homePage{padding-bottom:0}
+@media(max-width:1023px){
+  footer{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== AUTH ===== -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-left">
+    <img src="dekat-pedaftaran.jpg" alt="Glowstore">
+    <div class="auth-left-overlay">
+      <div class="auth-left-quote">Cantik dari<br><em style="color:var(--gold)">Dalam</em> &<br>Luar</div>
+      <div class="auth-left-sub">✦ Skincare & Makeup Terbaik 2026</div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <span class="auth-logo">Glowstore</span>
+    <div class="auth-tagline">Skincare & Makeup Original</div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabMasuk" onclick="switchAuthTab('masuk')">Masuk</div>
+      <div class="auth-tab" id="tabDaftar" onclick="switchAuthTab('daftar')">Daftar</div>
+    </div>
+
+    <!-- FORM MASUK -->
+    <div id="formMasuk" style="display:flex;flex-direction:column;gap:14px">
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" id="loginEmail" type="email" placeholder="Email" autocomplete="email" onkeydown="if(event.key==='Enter')handleLogin()">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input class="auth-input" id="loginPassword" type="password" placeholder="Masukkan password" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLogin()">
+      </div>
+      <div id="loginError" style="color:#e07da0;font-size:0.78rem;display:none"></div>
+      <button type="button" class="auth-btn" onclick="handleLogin()">Masuk ✨</button>
+      <div style="text-align:center;font-size:0.78rem;color:#aaa">Belum punya akun? <span style="color:var(--green);cursor:pointer;font-weight:500" onclick="switchAuthTab('daftar')">Daftar sekarang</span></div>
+    </div>
+
+    <!-- FORM DAFTAR -->
+    <div id="formDaftar" style="display:none;flex-direction:column;gap:14px">
+      <div class="auth-field">
+        <label class="auth-label">Nama Lengkap</label>
+        <input class="auth-input" id="regName" type="text" placeholder="Nama Lengkap" autocomplete="name" onkeydown="if(event.key==='Enter')handleRegister()">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" id="regEmail" type="email" placeholder="Email @gmail.com" autocomplete="email" onkeydown="if(event.key==='Enter')handleRegister()">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Password</label>
+        <input class="auth-input" id="regPassword" type="password" placeholder="Minimal 6 karakter" autocomplete="new-password" onkeydown="if(event.key==='Enter')handleRegister()">
+      </div>
+      <div id="regError" style="color:#e07da0;font-size:0.78rem;display:none"></div>
+      <button type="button" class="auth-btn" onclick="handleRegister()">Daftar Sekarang 🌸</button>
+      <div style="text-align:center;font-size:0.78rem;color:#aaa">Sudah punya akun? <span style="color:var(--green);cursor:pointer;font-weight:500" onclick="switchAuthTab('masuk')">Masuk di sini</span></div>
+    </div>
+
+  </div>
+
+  <!-- Auth success overlay - di dalam authScreen agar ikut hidden -->
+  <div class="auth-success" id="authSuccess">
+    <div style="font-size:2.5rem">🎉</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--green)" id="authSuccessTitle">Selamat Datang!</div>
+    <div style="font-size:0.82rem;color:#888" id="authSuccessSub">Selamat berbelanja!</div>
+  </div>
+</div>
+
+<!-- ===== MOBILE DRAWER ===== -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="mobile-drawer" id="mobileDrawer">
+  <div class="drawer-top">
+    <div class="drawer-logo">Glowstore</div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-links">
+    <div class="drawer-link" onclick="closeDrawer();scrollToSection('products')"><span class="drawer-link-icon">🛍️</span> Produk</div>
+    <div class="drawer-link" onclick="closeDrawer();scrollToSection('categories')"><span class="drawer-link-icon">📂</span> Kategori</div>
+    <div class="drawer-link" onclick="closeDrawer();scrollToSection('promo')"><span class="drawer-link-icon">🏷️</span> Promo</div>
+    <div class="drawer-link" onclick="closeDrawer();openPanel('search')"><span class="drawer-link-icon">🔍</span> Cari Produk</div>
+    <div class="drawer-link" onclick="closeDrawer();openPanel('cart')"><span class="drawer-link-icon">🛒</span> Keranjang</div>
+  </div>
+  <div class="drawer-bottom"><p>© 2026 Glowstore Indonesia</p></div>
+</div>
+
+<!-- ===== HOME PAGE ===== -->
+<div id="homePage">
+
+<!-- NAVBAR -->
+<nav>
+  <a class="nav-logo">Glowstore</a>
+  <ul class="nav-links">
+    <li><a onclick="scrollToSection('products')">Produk</a></li>
+    <li><a onclick="scrollToSection('categories')">Kategori</a></li>
+    <li><a onclick="scrollToSection('promo')">Promo</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="nav-btn" onclick="openPanel('search')">🔍 <span class="nav-btn-label">Cari</span></button>
+    <button class="nav-btn" onclick="openPanel('cart')">🛒 <span class="nav-badge" id="cartCount">0</span></button>
+    <button class="nav-btn" id="navAccBtn" onclick="openPanel('account')">
+      <div class="nav-avatar" id="navAvatar"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg></div>
+      <span class="nav-btn-label" id="navUserName">Akun</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <span class="hero-tag">✦ Skincare & Makeup Terbaik 2026</span>
+    <h1 class="hero-title">Cantik dari<br><em>Dalam</em> &<br>Luar</h1>
+    <p class="hero-desc">Temukan produk skincare dan makeup pilihan terbaik untuk kulitmu. Glowing setiap hari, percaya diri setiap saat.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="scrollToSection('products')">Belanja Sekarang</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">500+</div><div class="stat-label">PRODUK</div></div>
+      <div><div class="stat-num">100K+</div><div class="stat-label">PELANGGAN</div></div>
+      <div><div class="stat-num">100%</div><div class="stat-label">GARANSI</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="promo-hero-wrap" id="promoHeroWrap">
+      <div class="promo-hero-track" id="promoHeroTrack">
+        <div class="promo-hero-slide"><img class="promo-img" src="hero-flash-sale.jpg"><div class="promo-overlay"></div><div class="promo-content"><div class="promo-tag">Flash Sale</div><div class="promo-title">Diskon Hingga 50% Off</div><button class="promo-cta" onclick="openAllProducts('sale','Flash Sale — Diskon 50%')">Belanja Sekarang</button></div></div>
+        <div class="promo-hero-slide"><img class="promo-img" src="hero-new-arrival.jpg"><div class="promo-overlay"></div><div class="promo-content"><div class="promo-tag">New Arrival</div><div class="promo-title">Produk Skincare Terbaru</div><button class="promo-cta" onclick="openAllProducts('new','New Arrival Skincare')">Lihat Koleksi</button></div></div>
+        <div class="promo-hero-slide"><img class="promo-img" src="hero-best-seller.jpg"><div class="promo-overlay"></div><div class="promo-content"><div class="promo-tag">Terpopuler</div><div class="promo-title">Best Seller Makeup 2026</div><button class="promo-cta" onclick="openAllProducts('bestseller','Best Seller 2026')">Temukan Pilihan</button></div></div>
+      </div>
+      <button class="carousel-btn prev" onclick="promoHeroGo(window._pHCur-1)">‹</button>
+      <button class="carousel-btn next" onclick="promoHeroGo(window._pHCur+1)">›</button>
+      <div class="carousel-dots" id="promoHeroDots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap"><div class="marquee-track">
+  <span class="marquee-item">Skincare Original <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">Makeup Tahan Lama <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">100% Produk Asli <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">Gratis Ongkir <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">Glowing Every Day <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">Best Seller 2026 <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">Skincare Original <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">Makeup Tahan Lama <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">100% Produk Asli <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">Gratis Ongkir <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">Glowing Every Day <span class="marquee-dot">✦</span></span>
+  <span class="marquee-item">Best Seller 2026 <span class="marquee-dot">✦</span></span>
+</div></div>
+
+<!-- CATEGORIES -->
+<section class="section" id="categories" style="background:#1E0F18;padding:32px 16px">
+  <div class="section-header"><span class="section-tag" style="color:#f9a8c9">✦ Jelajahi</span><h2 class="section-title" style="color:var(--cream)">Kategori Pilihan</h2></div>
+  <div class="categories-grid" style="grid-template-columns:repeat(2,1fr);max-width:800px;margin:0 auto">
+    <div class="cat-card" onclick="openSubcategoryPanel('skincare')"><img class="cat-img" src="kategori-skincare.jpg" loading="lazy"><div class="cat-overlay"></div><div class="cat-name">Skincare</div></div>
+    <div class="cat-card" onclick="openSubcategoryPanel('makeup')"><img class="cat-img" src="kategori-makeup.jpg" loading="lazy"><div class="cat-overlay"></div><div class="cat-name">Makeup</div></div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="section section-alt" id="products">
+  <div class="section-header"><span class="section-tag">✦ Pilihan Kami</span><h2 class="section-title">Produk Unggulan</h2></div>
+  <div class="products-grid" id="homeGrid"></div>
+  <div style="text-align:center;margin-top:28px"><button class="btn-primary" onclick="openAllProducts('all','Semua Produk')">Lihat Semua Produk</button></div>
+</section>
+
+
+<!-- SUSTAINABILITY -->
+<section class="sustain-section">
+  <div class="section-header"><span class="section-tag" style="color:var(--sage)">✦ Komitmen Kami</span><h2 class="section-title" style="color:var(--cream)">Belanja Bertanggung Jawab</h2></div>
+    <div class="sustain-grid">
+      <div class="sustain-card" onclick="openInfoPanel('eco')"><div class="sustain-icon">✅</div><div class="sustain-title">Produk Original</div><div class="sustain-text">Semua produk 100% original dan resmi. Bukan KW, bukan palsu.</div><div class="sustain-cta">Pelajari Lebih →</div></div>
+      <div class="sustain-card" onclick="openInfoPanel('shipping')"><div class="sustain-icon">🚚</div><div class="sustain-title">Pengiriman Cepat</div><div class="sustain-text">Pengiriman ke seluruh Indonesia dengan estimasi yang akurat.</div><div class="sustain-cta">Pelajari Lebih →</div></div>
+      <div class="sustain-card" onclick="openInfoPanel('quality')"><div class="sustain-icon">💄</div><div class="sustain-title">BPOM Terdaftar</div><div class="sustain-text">Seluruh produk sudah terdaftar BPOM dan aman digunakan.</div><div class="sustain-cta">Pelajari Lebih →</div></div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">Glowstore</div>
+      <div class="footer-brand-desc">Platform belanja skincare & makeup terpercaya. Produk original, harga terjangkau, pengiriman cepat ke seluruh Indonesia.</div>
+      <div class="footer-socials">
+        <a href="https://www.instagram.com/decsiha?igsh=aHM0dGZ4aDBkOGdt" target="_blank" class="social-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Perusahaan</div>
+      <ul><li><a onclick="openInfoPanel('about')">Tentang Kami</a></li><li><a onclick="openInfoPanel('blog')">Blog</a></li></ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Bantuan</div>
+      <ul><li><a onclick="openInfoPanel('faq')">FAQ</a></li><li><a onclick="openInfoPanel('contact')">Hubungi Kami</a></li><li><a onclick="openInfoPanel('privacy')">Kebijakan Privasi</a></li><li><a onclick="openInfoPanel('terms')">Syarat & Ketentuan</a></li></ul>
+    </div>
+  </div>
+  <div class="footer-bottom"><p>© 2026 Glowstore Indonesia. All rights reserved.</p></div>
+</footer>
+</div><!-- end homePage -->
+
+<!-- ===== BOTTOM NAV (mobile) ===== -->
+<div class="bottom-nav">
+  <button class="bottom-nav-item" onclick="closeAllPanels()">
+    <span class="bottom-nav-icon">🏠</span>
+    <span class="bottom-nav-label">Home</span>
+  </button>
+  <button class="bottom-nav-item" onclick="openAllProducts('all','Semua Produk')">
+    <span class="bottom-nav-icon">🛍️</span>
+    <span class="bottom-nav-label">Produk</span>
+  </button>
+  <button class="bottom-nav-item" onclick="scrollToSection('categories')">
+    <span class="bottom-nav-icon">📂</span>
+    <span class="bottom-nav-label">Kategori</span>
+  </button>
+</div>
+
+<!-- ===== PANELS ===== -->
+<div class="panel search-panel" id="panel-search">
+  <div class="panel-topbar">
+    <button class="panel-back" onclick="closePanel('search')">← Home</button>
+    <div class="search-input-row">
+      <span class="search-input-icon">🔍</span>
+      <input type="text" class="search-input" id="searchInput" placeholder="Cari produk..." oninput="doSearch(this.value)">
+      <button class="search-clear" onclick="document.getElementById('searchInput').value='';doSearch('')">✕</button>
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="search-hint" id="searchHint">Ketik untuk mencari produk...</div>
+    <div class="products-grid" id="searchResultsGrid"></div>
+  </div>
+</div>
+
+<div class="panel" id="panel-cart">
+  <div class="panel-topbar">
+    <button class="panel-back" onclick="closePanel('cart')">← Home</button>
+    <div class="panel-title">Keranjang Belanja</div>
+  </div>
+  <div class="panel-body"><div id="cartContent"></div></div>
+</div>
+
+<div class="panel" id="panel-account">
+  <div class="panel-topbar">
+    <button class="panel-back" onclick="closePanel('account')">← Home</button>
+    <div class="panel-title">Akun Saya</div>
+  </div>
+  <div class="panel-body acc-panel-body" id="accountContent"></div>
+</div>
+
+<div class="panel" id="panel-wishlist">
+  <div class="panel-topbar">
+    <button class="panel-back" onclick="closePanel('wishlist')">← Akun</button>
+    <div class="panel-title">♡ Favorit Saya</div>
+  </div>
+  <div class="panel-body"><div class="wishlist-grid" id="wishlistContent"></div></div>
+</div>
+
+<div class="panel" id="panel-allproducts">
+  <div class="panel-topbar">
+    <button class="panel-back" onclick="closePanel('allproducts')">← Home</button>
+    <div class="panel-title" id="allProductsTitle">Semua Produk</div>
+  </div>
+  <div class="panel-body">
+    <div class="filter-tabs" id="allProductsFilters"></div>
+    <div class="products-grid" id="allProductsGrid"></div>
+  </div>
+</div>
+
+
+<div class="panel" id="panel-range">
+  <div class="panel-topbar">
+    <button class="panel-back" onclick="closePanel('range')">← Home</button>
+    <div class="panel-title" id="rangeTitle">Range</div>
+  </div>
+  <div class="panel-body"><div class="products-grid" id="rangeGrid"></div></div>
+</div>
+
+<div class="panel" id="panel-info">
+  <div class="panel-topbar">
+    <button class="panel-back" onclick="closePanel('info')">← Home</button>
+    <div class="panel-title" id="infoPanelTitle"></div>
+  </div>
+  <div class="panel-body"><div class="info-content" id="infoContent"></div></div>
+</div>
+
+<div class="panel" id="panel-orders">
+  <div class="panel-topbar">
+    <button class="panel-back" onclick="closePanel('orders');openPanel('account')">← Akun</button>
+    <div class="panel-title" id="ordersPanelTitle">Pesanan Saya</div>
+  </div>
+  <div class="panel-body" id="ordersContent"></div>
+</div>
+
+<!-- ===== SUBCATEGORY PANEL ===== -->
+
+<!-- ===== CHECKOUT MODAL ===== -->
+<div class="modal-overlay" id="checkoutModal" onclick="closeCheckoutModal(event)">
+  <div class="modal-box">
+    <div class="modal-title">📦 Detail Pengiriman</div>
+    <div class="modal-sub">Isi data kamu agar pesanan bisa langsung kami proses</div>
+    <div id="modalOrderSummary"></div>
+    <div class="modal-field">
+      <label class="modal-label">Nama Lengkap</label>
+      <input class="modal-input" id="coName" type="text" placeholder="">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Nomor HP / WhatsApp</label>
+      <input class="modal-input" id="coPhone" type="tel" placeholder="">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Alamat Lengkap</label>
+      <textarea class="modal-input" id="coAddress" rows="3" placeholder="Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan, Kota, Kode Pos" style="resize:none;line-height:1.6"></textarea>
+    </div>
+    <div class="modal-note">📋 Pesanan akan otomatis ter-copy. Saat Instagram DM terbuka, langsung paste (tempel) pesannya.</div>
+    <div class="modal-btn-row">
+      <button class="modal-btn-cancel" onclick="closeCheckoutModal()">Batal</button>
+      <button class="modal-btn-send" onclick="submitCheckout()">📩 Kirim ke IG DM</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="panel" id="panel-subcategory">
+  <div class="panel-topbar">
+    <button class="panel-back" id="subcategoryBackBtn" onclick="closePanel('subcategory')">← Kembali</button>
+    <div class="panel-title" id="subcategoryTitle">Skincare</div>
+  </div>
+    <div class="panel-body">
+    <div id="subcategoryGrid"></div>
+  </div>
+</div>
+
+<div class="panel" id="panel-category">
+  <div class="panel-topbar">
+    <button class="panel-back" onclick="closePanel('category')">← Kembali</button>
+    <div class="panel-title" id="categoryTitle">Kategori</div>
+  </div>
+  <div class="panel-body"><div class="products-grid" id="categoryGrid"></div></div>
+</div>
+
+<div class="panel" id="panel-product">
+  <div class="panel-topbar">
+    <button class="panel-back" onclick="closePanel('product')">← Kembali</button>
+    <div class="panel-title" id="productPanelTitle">Detail Produk</div>
+    <div style="position:relative;flex-shrink:0">
+      <button class="share-btn" style="width:36px;height:36px;border:1.5px solid rgba(155,77,110,0.2);border-radius:50%;font-size:1.2rem;color:var(--green)" onclick="toggleShareMenu('detail')">⋯</button>
+      <div class="share-dropdown" id="share-detail">
+        <button class="share-dropdown-item" onclick="copyProductLink(currentProductId)"><span>🔗</span><span>Salin Link Produk</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="panel-body" id="productContent" style="padding-bottom:80px"></div>
+  <div class="detail-actions-bar" id="productActionsBar"></div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toastMsg"></span></div>
+
+<script>
+// ===== STORE (harus paling atas) =====
+const store=(()=>{
+  const mem={};
+  let hasLS=false;
+  try{localStorage.setItem('_t','1');localStorage.removeItem('_t');hasLS=true;}catch(e){}
+  function setCookie(k,v,days){try{const d=new Date();d.setTime(d.getTime()+(days||365)*864e5);document.cookie=encodeURIComponent(k)+'='+encodeURIComponent(v)+';expires='+d.toUTCString()+';path=/';}catch(e){}}
+  function getCookie(k){try{const m=document.cookie.match('(?:^|; )'+encodeURIComponent(k)+'=([^;]*)');return m?decodeURIComponent(m[1]):null;}catch(e){return null;}}
+  function delCookie(k){try{document.cookie=encodeURIComponent(k)+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';}catch(e){}}
+  return{
+    get(k){
+      if(hasLS){try{const v=localStorage.getItem(k);if(v)return JSON.parse(v);}catch(e){}}
+      const c=getCookie(k);if(c){try{return JSON.parse(c);}catch(e){}}
+      return mem[k]??null;
+    },
+    set(k,v){
+      const s=JSON.stringify(v);
+      if(hasLS){try{localStorage.setItem(k,s);}catch(e){}}
+      try{setCookie(k,s,365);}catch(e){}
+      mem[k]=v;
+    },
+    del(k){
+      if(hasLS){try{localStorage.removeItem(k);}catch(e){}}
+      delCookie(k);
+      delete mem[k];
+    }
+  };
+})();
+
+// ===== DATA =====
+const products=[
+  {id:1,name:"Wardah Colorfit Cream Blush",price:89000,originalPrice:115000,category:"makeup",subcategory:"blush",badge:"Best Seller",image:"wardah-cream-blush.jpg",range:"Makeup",description:"Blush cream dengan formula ringan yang memberikan tampilan pipi merona natural tahan lama. Mudah diaplikasikan dengan jari.",features:["Formula cream ringan","Warna natural & blendable","Tahan lama seharian","Tidak cakey di kulit"],
+  howto:["Aplikasikan moisturizer dan primer terlebih dahulu sebagai base.","Ambil sedikit produk menggunakan ujung jari atau brush blush.","Tap lembut pada bagian tulang pipi dengan gerakan melingkar ke atas.","Blend hingga merata untuk hasil yang natural dan seamless."],
+  caution:["Hindari penggunaan di area yang sedang mengalami iritasi atau luka terbuka.","Jangan berbagi produk dengan orang lain untuk menjaga kebersihan.","Hentikan pemakaian jika muncul reaksi alergi seperti kemerahan atau gatal."]},
+
+  {id:2,name:"Emina Airy UV Gel SPF 50 PA++",price:55000,originalPrice:72000,category:"skincare",subcategory:"sunscreen",badge:"New",image:"emina-uv-gel-spf50.jpg",range:"Skincare",description:"Sunscreen gel airy dengan SPF 50 PA++ yang diperkuat Cica & Oat untuk melindungi sekaligus menenangkan kulit.",features:["SPF 50 PA++","Cica & Oat extract","Tekstur gel ringan","Tidak lengket & cepat meresap"],
+  howto:["Gunakan sebagai langkah terakhir skincare routine, sebelum makeup.","Ambil secukupnya (sekitar 2 ruas jari) untuk seluruh wajah dan leher.","Aplikasikan merata 15–20 menit sebelum beraktivitas di luar ruangan.","Reapply setiap 2–3 jam jika berada di bawah sinar matahari langsung."],
+  caution:["Jangan skip sunscreen meski cuaca mendung — UV tetap menembus awan.","Hindari area mata. Jika terkena, bilas segera dengan air bersih.","Tidak disarankan dikombinasikan langsung dengan AHA/BHA — beri jeda atau gunakan di malam hari untuk eksfolian."]},
+
+  {id:3,name:"Glad2Glow AHA BHA PHA Peeling Solution",price:79000,originalPrice:105000,category:"skincare",subcategory:"serum",badge:"",image:"glad2glow-peeling-solution.jpg",range:"Skincare",description:"Peeling solution intensif dengan AHA BHA PHA untuk eksfoliasi kulit secara mendalam, menghaluskan tekstur dan membuat kulit glowing.",features:["AHA + BHA + PHA","Eksfoliasi intensif","Kulit lebih halus & cerah","15ml praktis"],
+  howto:["Gunakan hanya pada malam hari, setelah membersihkan wajah.","Aplikasikan tipis-tipis pada wajah menggunakan kapas atau ujung jari.","Diamkan selama 10–15 menit, jangan dibilas — biarkan terserap.","Lanjutkan dengan moisturizer untuk mengunci kelembapan kulit."],
+  caution:["Jangan gunakan bersamaan dengan produk Retinol, Vitamin C, atau Niacinamide dosis tinggi — kombinasi ini dapat menyebabkan iritasi dan over-exfoliation.","Wajib menggunakan sunscreen keesokan paginya karena AHA/BHA meningkatkan sensitivitas kulit terhadap UV.","Mulai penggunaan 1–2x seminggu, lalu tingkatkan frekuensi secara bertahap sesuai toleransi kulit.","Tidak disarankan untuk kulit sensitif atau kulit yang sedang breakout parah."]},
+
+  {id:4,name:"Sonik Scents Face Mist Saffron & Niacinamide",price:45000,originalPrice:60000,category:"skincare",subcategory:"toner",badge:"",image:"sonik-face-mist-saffron.jpg",range:"Skincare",description:"Face mist saffron dengan niacinamide yang mengontrol minyak berlebih, mengurangi jerawat, dan menjaga kulit tetap bersih seharian.",features:["Saffron + Niacinamide","Kontrol minyak berlebih","Anti jerawat","100ml ukuran besar"],
+  howto:["Kocok botol terlebih dahulu sebelum digunakan.","Semprotkan dari jarak 20–30 cm dari wajah dengan mata tertutup.","Bisa digunakan setelah skincare pagi sebagai setting mist, atau kapan pun kulit terasa kusam dan lelah.","Tepuk-tepuk lembut agar produk meresap sempurna."],
+  caution:["Hindari menyemprot terlalu dekat ke area mata.","Jika kamu menggunakan Vitamin C serum, pastikan Niacinamide diaplikasikan setelah Vitamin C sudah terserap (beri jeda 15 menit) untuk menghindari pembentukan niasin yang dapat memerahkan kulit.","Simpan di tempat sejuk dan hindari paparan sinar matahari langsung."]},
+
+  {id:5,name:"Scora Sheer Glow Tone Up Cream",price:65000,originalPrice:85000,category:"skincare",subcategory:"toneup",badge:"",image:"scora-toneup-cream.jpg",range:"Skincare",description:"Tone up cream dengan niacinamide yang mencerahkan, meratakan, dan menghaluskan kulit. Cocok untuk semua jenis kulit.",features:["Niacinamide","Tone-up & mencerahkan","Smooth-tinted finish","30gr / untuk semua kulit"],
+  howto:["Gunakan setelah toner dan serum, sebelum sunscreen.","Ambil secukupnya dan aplikasikan merata ke seluruh wajah.","Blend dengan gerakan ke atas menggunakan jari atau beauty sponge.","Bisa digunakan sebagai pengganti foundation untuk tampilan bare-skin natural."],
+  caution:["Jika menggunakan AHA/BHA toner sebelumnya, beri jeda beberapa menit agar pH kulit stabil sebelum mengaplikasikan Niacinamide.","Hindari kombinasi langsung dengan Vitamin C serum dalam satu layer — gunakan salah satu di pagi hari dan yang lain di malam hari."]},
+
+  {id:6,name:"OMG Oh My Glam Coverlast",price:89000,originalPrice:119000,category:"makeup",subcategory:"bedak",badge:"",image:"omg-coverlast.jpg",range:"Makeup",description:"Bedak/cushion coverlast dari Oh My Glam dengan coverage tinggi yang tahan lama dan memberikan tampilan flawless sepanjang hari.",features:["Coverage tinggi","Tahan lama","Finish flawless","Kemasan compact elegan"],
+  howto:["Pastikan kulit sudah diberi moisturizer dan sunscreen sebelumnya.","Tekan puff pada cushion, lalu tap merata ke seluruh wajah.","Untuk coverage lebih penuh, lakukan layering tipis-tipis secara bertahap.","Gunakan untuk touch-up siang hari agar makeup tetap fresh."],
+  caution:["Cuci puff secara rutin (minimal seminggu sekali) untuk mencegah penumpukan bakteri.","Hindari menekan terlalu keras agar hasil tidak terlihat cakey.","Jangan gunakan di atas kulit yang belum dibersihkan — ini dapat menyumbat pori."]},
+
+  {id:7,name:"Implora Eyebrow Pencil Dark Brown",price:25000,originalPrice:35000,category:"makeup",subcategory:"alis",badge:"",image:"implora-eyebrow-pencil.jpg",range:"Makeup",description:"Pensil alis dengan warna dark brown yang natural, dilengkapi sisir alis di ujungnya untuk hasil yang rapi dan presisi.",features:["Warna dark brown natural","Ujung sisir alis","Mudah dibentuk","Tahan lama"],
+  howto:["Sisir alis terlebih dahulu menggunakan ujung sisir yang tersedia di produk ini.","Gambar outline alis dengan tekanan ringan mengikuti bentuk alami alis.","Isi bagian yang jarang dengan stroke-stroke pendek menyerupai rambut asli.","Sisir kembali untuk menyatukan warna agar hasil terlihat natural."],
+  caution:["Runcingkan ujung pensil secara berkala agar aplikasi tetap presisi.","Hindari menarik kulit terlalu kencang saat menggambar alis — ini dapat menyebabkan iritasi.","Jangan gunakan jika kulit di area alis sedang iritasi atau terdapat luka."]},
+
+  {id:8,name:"Luxcrime Perfect Canvas Primer",price:129000,originalPrice:165000,category:"makeup",subcategory:"primer",badge:"New",image:"luxcrime-primer.jpg",range:"Makeup",description:"Primer mattifying poreless yang membuat makeup tahan lebih lama, menyamarkan pori-pori, dan memberikan base yang sempurna.",features:["Mattifying & poreless","Makeup lebih tahan lama","Tekstur ringan","30gr net"],
+  howto:["Aplikasikan setelah skincare selesai dan sunscreen sudah meresap sempurna.","Ambil seukuran biji kacang, ratakan ke seluruh wajah dengan jari atau brush.","Fokuskan pada area T-zone (dahi, hidung, dagu) yang cenderung lebih berminyak.","Tunggu 1–2 menit hingga primer mengering sebelum mengaplikasikan foundation atau cushion."],
+  caution:["Penggunaan terlalu banyak dapat membuat makeup terlihat cakey — gunakan tipis dan merata.","Pastikan skincare sudah terserap sepenuhnya sebelum primer diaplikasikan agar hasilnya optimal.","Tidak perlu menggunakan moisturizer berlebih jika kamu bertipe kulit berminyak — primer ini sudah cukup mattifying."]},
+
+  {id:9,name:"Wardah Lightening Blue Clay Mask",price:49000,originalPrice:65000,category:"skincare",subcategory:"masker",badge:"Sale",image:"wardah-clay-mask.jpg",range:"Skincare",description:"Clay mask dengan Advanced Niacinamide dan Mineral Clay yang mencerahkan kulit sekaligus menyerap minyak berlebih secara efektif.",features:["Niacinamide advanced","Mineral Clay","Mencerahkan kulit","Serap minyak berlebih"],
+  howto:["Gunakan setelah membersihkan wajah, pada malam hari.","Aplikasikan lapisan tipis merata ke seluruh wajah menggunakan kuas mask atau jari.","Hindari area mata dan bibir yang lebih sensitif.","Diamkan 10–15 menit hingga mengering, lalu bilas dengan air hangat."],
+  caution:["Jangan gunakan clay mask bersamaan atau segera setelah AHA/BHA — ini terlalu agresif untuk kulit dan berisiko menyebabkan iritasi parah.","Gunakan maksimal 2x seminggu. Pemakaian berlebihan dapat membuat kulit terlalu kering dan merusak skin barrier.","Setelah masker, selalu gunakan moisturizer untuk mengembalikan kelembapan kulit."]},
+
+  {id:10,name:"Glad2Glow Micellar Water Mugwort",price:69000,originalPrice:89000,category:"skincare",subcategory:"cleanser",badge:"",image:"glad2glow-micellar-water.jpg",range:"Skincare",description:"Micellar water dengan Mugwort & Salicylic Acid yang efektif membersihkan makeup waterproof dan minyak berlebih tanpa perlu bilas.",features:["Mugwort + Salicylic Acid","Bersihkan makeup waterproof","Acne clear","300ml ukuran besar"],
+  howto:["Tuangkan micellar water pada kapas hingga lembap.","Tempelkan pada wajah dan biarkan selama 5–10 detik agar makeup larut.","Usap perlahan dengan gerakan menyeka — jangan digosok keras.","Ulangi hingga kapas bersih, lalu lanjutkan dengan face wash untuk double cleanse."],
+  caution:["Meskipun no-rinse, untuk penggunaan malam hari sangat disarankan tetap melanjutkan dengan face wash agar pori-pori benar-benar bersih.","Karena mengandung Salicylic Acid, kulit sensitif sebaiknya melakukan patch test terlebih dahulu di area rahang.","Hindari kontak langsung dengan mata."]},
+
+  {id:11,name:"Onlyou Sunscreen Cream SPF 50 PA+",price:75000,originalPrice:99000,category:"skincare",subcategory:"sunscreen",badge:"Best Seller",image:"onlyou-sunscreen.jpg",range:"Skincare",description:"Sunscreen cream premium SPF 50 PA+ dengan formula lembut yang melindungi kulit dari paparan sinar UVA dan UVB secara optimal.",features:["SPF 50 PA+","Perlindungan UVA & UVB","Formula lembut","Kemasan pump praktis"],
+  howto:["Aplikasikan sebagai langkah terakhir skincare, sebelum makeup.","Gunakan sekitar 2 ruas jari untuk area wajah dan leher agar perlindungan optimal.","Ratakan dengan tap-tap lembut — jangan digosok agar tidak merusak lapisan aktif SPF.","Reapply setiap 2–3 jam saat beraktivitas di luar ruangan."],
+  caution:["Satu lapisan tipis tidak cukup memberikan perlindungan penuh — pastikan jumlahnya memadai.","Jangan skip sunscreen meski kamu bekerja di dalam ruangan — sinar UV bisa menembus kaca jendela.","Hindari penggunaan langsung setelah AHA/BHA — beri jeda minimal 15–20 menit agar pH kulit stabil."]},
+
+  {id:12,name:"Glad2Glow Centella Gel Moisturizer",price:89000,originalPrice:119000,category:"skincare",subcategory:"moisturizer",badge:"",image:"glad2glow-gel-moisturizer.jpg",range:"Skincare",description:"Gel moisturizer dengan Centella Asiatica dan Allantoin yang menenangkan kulit, meredakan jerawat, dan menjaga kelembapan optimal.",features:["Centella Asiatica","Allantoin soothing","Menenangkan & calming","55gr ukuran besar"],
+  howto:["Gunakan setelah toner dan serum, sebagai langkah moisturizer dalam rutinitas.","Ambil secukupnya dan aplikasikan merata ke seluruh wajah dengan gerakan menepuk lembut.","Bisa digunakan pagi dan malam hari.","Di malam hari, bisa diaplikasikan lebih banyak sebagai sleeping mask ringan."],
+  caution:["Moisturizer berbasis gel seperti ini paling efektif diaplikasikan saat kulit masih sedikit lembap — jangan tunggu kulit benar-benar kering.","Aman dikombinasikan dengan hampir semua bahan aktif, termasuk AHA/BHA dan Niacinamide.","Jika menggunakan Retinol di malam hari, oleskan moisturizer ini setelahnya sebagai barrier untuk meminimalkan efek kekeringan."]},
+
+  {id:13,name:"Viva Air Mawar Rose Water",price:15000,originalPrice:22000,category:"skincare",subcategory:"toner",badge:"",image:"viva-rose-water.jpg",range:"Skincare",description:"Air mawar Viva Cosmetics dengan ekstrak bunga mawar asli yang menyegarkan, melembapkan, dan cocok untuk kulit sensitif.",features:["Ekstrak bunga mawar asli","Untuk kulit sensitif","200ml ukuran besar","Dermatologis tested"],
+  howto:["Tuangkan pada kapas dan usapkan lembut ke seluruh wajah setelah cuci muka.","Atau semprotkan langsung ke wajah sebagai facial mist kapan pun dibutuhkan.","Bisa digunakan sebagai toner pertama sebelum toner aktif lainnya.","Cocok juga untuk membasahi beauty blender sebelum mengaplikasikan makeup."],
+  caution:["Meskipun gentle, tetap lakukan patch test jika kamu baru pertama kali mencoba.","Tidak mengandung bahan aktif eksfoliasi, sehingga aman dikombinasikan dengan produk apapun.","Simpan di kulkas untuk sensasi cooling yang lebih menenangkan, terutama saat kulit sedang meradang."]},
+
+  {id:14,name:"Pigeon Teens Acne Ranger Loose Powder",price:35000,originalPrice:48000,category:"makeup",subcategory:"bedak",badge:"",image:"pigeon-loose-powder.jpg",range:"Makeup",description:"Bedak tabur anti jerawat khusus remaja dengan Willow Bark Extract dan 8 bahan alami untuk kulit bersih bebas jerawat.",features:["Willow Bark Extract","8 bahan alami","Anti jerawat","Khusus kulit remaja"],
+  howto:["Gunakan setelah skincare dan sunscreen sudah meresap sempurna.","Celupkan brush bedak dan ketuk perlahan untuk melepas kelebihan produk.","Aplikasikan merata ke seluruh wajah dengan gerakan ringan.","Fokuskan pada area T-zone untuk kontrol minyak maksimal."],
+  caution:["Jangan gunakan bedak tabur secara berlebihan — lapisan yang terlalu tebal justru dapat menyumbat pori dan memperburuk jerawat.","Cuci brush secara rutin untuk mencegah penumpukan bakteri yang bisa memicu breakout.","Hindari menghirup serbuk bedak secara langsung."]},
+
+  {id:15,name:"Buttered Lano Salve Lip Balm Blueberry",price:49000,originalPrice:65000,category:"skincare",subcategory:"lip",badge:"",image:"buttered-lano-lip-balm.jpg",range:"Skincare",description:"Lip balm serbaguna dengan lanolin dan aroma blueberry yang melembapkan bibir secara intensif. All-in-one solution untuk bibir kering.",features:["Lanolin premium","Aroma blueberry","Multipurpose balm","10gr travel size"],
+  howto:["Oleskan tipis-tipis pada bibir kapan pun terasa kering atau pecah-pecah.","Untuk perawatan intensif, oleskan lebih tebal sebelum tidur sebagai overnight lip mask.","Bisa juga digunakan sebagai pelembap ringan untuk area kering lainnya seperti ujung siku atau kutikel.","Oleskan di bawah lip cream matte untuk mencegah bibir kering dan pecah-pecah."],
+  caution:["Jika menggunakan lip scrub untuk eksfoliasi bibir, selalu aplikasikan lip balm ini setelahnya untuk memulihkan kelembapan.","Hindari menjilat bibir berlebihan setelah pemakaian — ini justru membuat bibir semakin kering.","Aman untuk bibir sensitif, namun hentikan jika muncul reaksi alergi terhadap lanolin."]},
+
+  {id:16,name:"Dazzle Me Ink-Matte Lip Cream",price:59000,originalPrice:79000,category:"makeup",subcategory:"lips",badge:"Best Seller",image:"dazzleme-lip-cream.jpg",range:"Makeup",description:"Lip cream ink-matte dengan formula tahan lama yang memberikan warna intens dan nyaman di bibir tanpa rasa kering.",features:["Formula ink-matte","Warna intens & pigmented","Tahan lama","Nyaman di bibir"],
+  howto:["Oleskan lip balm terlebih dahulu dan tunggu meresap agar bibir tidak kering saat memakai lip matte.","Aplikasikan dari bagian tengah bibir, lalu ratakan ke sudut bibir.","Untuk tampilan ombre, aplikasikan lebih pekat di bagian dalam bibir dan blend ke luar.","Biarkan mengering 30–60 detik sebelum minum atau makan agar warna lebih tahan lama."],
+  caution:["Hindari menggunakan lip matte formula pada bibir yang sedang pecah-pecah atau kering parah — produk ini akan menempel tidak rata dan terlihat tidak nyaman.","Jangan menggosok bibir saat mengaplikasikan — cukup tap dan blend lembut.","Untuk membersihkan, gunakan micellar water atau cleansing oil agar bibir tidak teriritasi."]},
+
+  {id:17,name:"The Originote H-Llow Clarifying Toner",price:55000,originalPrice:72000,category:"skincare",subcategory:"toner",badge:"",image:"originote-clarifying-toner.jpg",range:"Skincare",description:"Clarifying toner dengan AHA + BHA + PHA dan Willow Bark untuk eksfoliasi lembut, membersihkan pori, dan mencerahkan kulit.",features:["AHA + BHA + PHA","Willow Bark Extract","Eksfoliasi lembut","100ml ukuran standar"],
+  howto:["Gunakan setelah cuci muka, pada malam hari untuk pemula.","Tuangkan sedikit produk pada kapas, lalu usapkan lembut ke seluruh wajah.","Jangan dibilas — biarkan terserap selama 5–10 menit sebelum melanjutkan ke produk berikutnya.","Lanjutkan dengan serum, moisturizer, dan tabir surya di pagi harinya."],
+  caution:["Jangan gunakan bersamaan dengan Retinol atau Vitamin C dosis tinggi — kombinasi ini dapat menyebabkan iritasi serius dan merusak skin barrier.","Wajib menggunakan sunscreen setiap pagi karena AHA/BHA meningkatkan sensitivitas kulit terhadap sinar UV.","Mulai 2–3x seminggu dan tingkatkan frekuensi secara bertahap. Jangan langsung digunakan setiap hari jika kulit belum terbiasa.","Hentikan pemakaian jika terasa perih berkepanjangan, muncul kemerahan, atau kulit mengelupas berlebihan."]},
+
+  {id:18,name:"Mireya Cosmetics The Art Setting Spray",price:89000,originalPrice:119000,category:"makeup",subcategory:"setting",badge:"New",image:"mireya-setting-spray.jpg",range:"Makeup",description:"Setting spray flawless dengan Niacinamide, Witch Hazel, Allantoin dan Seawater Extract untuk makeup tahan lama dan kulit glowing.",features:["Niacinamide + Witch Hazel","Allantoin + Seawater Extract","Makeup tahan lama","100ml ukuran standar"],
+  howto:["Kocok botol sebelum digunakan.","Semprotkan dari jarak 20–30 cm ke seluruh wajah setelah makeup selesai diaplikasikan.","Gunakan pola X dan T — semprotkan dari dahi ke dagu (T) dan dari pipi kiri ke kanan (X).","Biarkan mengering secara alami — jangan diusap."],
+  caution:["Tutup mata dan mulut saat menyemprotkan untuk menghindari iritasi.","Jangan disemprotkan terlalu banyak dalam satu waktu — cukup 2–3 semprot untuk hasil optimal.","Jika menggunakan Niacinamide dalam skincare, tidak masalah dikombinasikan dengan setting spray ini karena kandungannya cukup ringan."]},
+
+  {id:19,name:"MS Glow Acnezone Azaglow Serum",price:125000,originalPrice:165000,category:"skincare",subcategory:"serum",badge:"Sale",image:"msglow-azaglow-serum.jpg",range:"Skincare",description:"Serum acne calming dengan Azelaic Acid 10% untuk meredakan jerawat, memperbaiki kulit, dan mengurangi PIH & PE secara efektif.",features:["Azelaic Acid 10%","Acne calming & skin repair","Reduce PIH & PE","Cocok kulit sensitif"],
+  howto:["Gunakan setelah toner, pada pagi atau malam hari.","Ambil 2–3 tetes dan ratakan ke seluruh wajah atau fokus ke area bermasalah.","Biarkan meresap 1–2 menit sebelum melanjutkan ke moisturizer.","Untuk hasil maksimal, gunakan secara konsisten minimal 4–6 minggu."],
+  caution:["Azelaic Acid cukup aman dikombinasikan dengan Niacinamide dan Retinol, namun tetap mulai perlahan untuk kulit sensitif.","Hindari penggunaan bersamaan dengan AHA/BHA atau Benzoyl Peroxide dalam satu rutinitas — beri jeda waktu pagi dan malam.","Selalu gunakan sunscreen di pagi hari, karena serum aktif ini meningkatkan sensitivitas kulit terhadap UV.","Jika terjadi purging (jerawat kecil-kecil sementara), ini adalah hal normal — lanjutkan pemakaian dan pantau responsnya."]},
+
+  {id:20,name:"Glow FX Glow Bomb Serum 19% Booster",price:99000,originalPrice:135000,category:"skincare",subcategory:"serum",badge:"New",image:"glowfx-glow-bomb-serum.jpg",range:"Skincare",description:"Glow booster serum dengan 19% aktif: Niacinamide 4%, Tranexamic Acid, Licorice Extract 5%, Hyaluronic dan PGA untuk kulit cerah maksimal.",features:["Niacinamide 4% + Tranexamic","Licorice Extract 5%","Hyaluronic + PGA","30ml glow booster"],
+  howto:["Gunakan setelah toner, sebelum moisturizer — cocok untuk pagi maupun malam hari.","Ambil 3–4 tetes dan aplikasikan merata ke seluruh wajah dengan gerakan menepuk lembut.","Bisa dilayer dengan serum lain, namun pastikan serum berbasis air diaplikasikan lebih dulu sebelum yang lebih kental.","Gunakan secara konsisten setiap hari untuk hasil brightening yang optimal."],
+  caution:["Karena mengandung Niacinamide, hindari penggunaan langsung berdampingan dengan Vitamin C dalam satu lapisan — beri jeda 15–20 menit atau gunakan salah satunya di pagi hari dan yang lain di malam hari.","Jangan dikombinasikan dengan AHA/BHA dalam satu waktu penggunaan — kulit dapat mengalami over-stimulation.","Tetap gunakan sunscreen setiap pagi meskipun ini adalah brightening serum — perlindungan UV adalah kunci hasil yang optimal."]},
+
+  {id:21,name:"Glad2Glow Powdery Blush On",price:35000,originalPrice:45000,category:"makeup",subcategory:"blush",badge:"New",image:"glad2glow-blush-on.jpg",range:"Makeup",description:"Blush on kompak dengan tekstur powdery yang lembut dan ringan. Memberikan warna pipi natural yang tahan lama dengan hasil seamless blend.",features:["Tekstur powdery ringan","Natural blendable finish","Tahan lama seharian","Compact & travel-friendly"],
+  howto:["Gunakan brush blush atau puff kecil untuk mengambil produk.","Aplikasikan pada tulang pipi dengan gerakan melingkar ke arah atas.","Blend hingga merata untuk hasil yang natural dan seamless.","Bisa di-layer untuk intensitas warna yang lebih tinggi."],
+  caution:["Hindari area dekat mata untuk mencegah iritasi.","Simpan di tempat sejuk dan kering, jauhkan dari sinar matahari langsung.","Hentikan pemakaian jika muncul reaksi alergi seperti kemerahan atau gatal."]},
+
+  {id:22,name:"Emina Bright Stuff Niacinamide Facial Cleanser",price:28000,originalPrice:null,category:"skincare",subcategory:"cleanser",badge:"Best Seller",image:"emina-facial-cleanser.jpg",range:"Skincare",description:"Pembersih wajah brightening dengan Niacinamide, Oxy Ceramide, dan Summer Plum Extract. Membersihkan pori, menyeimbangkan minyak, dan mencerahkan kulit tanpa membuat kulit kering.",features:["Niacinamide + Oxy Ceramide","Summer Plum Extract","Cocok semua jenis kulit","BPOM terdaftar"],
+  howto:["Basahi wajah dengan air hangat.","Tuangkan produk secukupnya ke telapak tangan dan busakan.","Pijat lembut ke wajah selama 30–60 detik dengan gerakan melingkar.","Bilas hingga bersih, lanjutkan dengan rangkaian skincare."],
+  caution:["Hindari area mata — jika terkena bilas segera dengan air bersih.","Gunakan sunscreen setiap pagi karena kandungan Niacinamide dapat meningkatkan sensitivitas terhadap UV.","Hentikan pemakaian jika muncul iritasi atau kemerahan."]},
+
+  {id:23,name:"Emina Daily Matte BB Cream SPF 25",price:32000,originalPrice:null,category:"makeup",subcategory:"bedak",badge:"Best Seller",image:"emina-bb-cream.jpg",range:"Makeup",description:"BB Cream dengan healthy-matte finish tahan 8 jam. Dilengkapi SPF 25 PA++, Vitamin E, dan Oil Control Agent untuk kulit matte seharian yang tetap lembap.",features:["Tahan 8 jam oil control","SPF 25 PA++ sun protection","Vitamin E + Trehalose","Non-comedogenic & non-acnegenic"],
+  howto:["Aplikasikan moisturizer sebagai base terlebih dahulu.","Ambil BB Cream secukupnya dan ratakan ke seluruh wajah menggunakan jari atau beauty sponge.","Blend hingga merata terutama di area T-zone.","Untuk coverage lebih, layer dengan compact powder di atasnya."],
+  caution:["Untuk kulit sangat sensitif, lakukan patch test terlebih dahulu.","Meski mengandung SPF 25, tetap aplikasikan sunscreen terpisah untuk aktivitas outdoor intens.","Jauhkan dari mata — jika terkena bilas segera."]},
+
+  {id:24,name:"Focallure 2MM Ultra-fine Mascara",price:45000,originalPrice:65000,category:"makeup",subcategory:"maskara",badge:"New",image:"focallure-mascara.jpg",range:"Makeup",description:"Mascara waterproof dengan sikat ultra-fine 2MM untuk bulu mata lebih panjang, lentik, dan volume. Formula quick-dry smudge-proof tahan sepanjang hari.",features:["2MM ultra-fine brush","Waterproof & smudge-proof","Extra curl & volume","Quick-dry formula"],
+  howto:["Gunting lash curler terlebih dahulu untuk hasil curl maksimal.","Mulai dari pangkal bulu mata, sikat ke atas dengan gerakan zigzag.","Aplikasikan 2–3 lapisan untuk volume lebih, biarkan kering sejenak tiap lapisan.","Untuk bulu mata bawah, gunakan ujung sikat dengan gerakan halus."],
+  caution:["Jangan gunakan jika mata sedang meradang atau iritasi.","Hindari berbagi produk mascara dengan orang lain untuk mencegah infeksi mata.","Gunakan makeup remover khusus waterproof agar bulu mata tidak rontok saat dibersihkan.","Ganti produk setiap 3 bulan setelah dibuka untuk menjaga kebersihan."]},
+
+  {id:25,name:"O.TWO.O Velvet Matte Lipstick",price:38000,originalPrice:55000,category:"makeup",subcategory:"lips",badge:"New",image:"otwoo-velvet-lipstick.jpg",range:"Makeup",description:"Lipstik matte dengan formula velvet yang lembap dan ringan. Warna cokelat nude yang versatile untuk tampilan sehari-hari maupun makeup bold.",features:["Velvet matte finish","Formula lembap & ringan","Warna nude versatile","Tahan lama seharian"],
+  howto:["Aplikasikan langsung ke bibir mulai dari bagian tengah ke sudut bibir.","Untuk hasil lebih presisi, gunakan lip liner terlebih dahulu sesuai kontur bibir.","Bisa di-layer untuk warna yang lebih intens dan opak.","Untuk kesan ombre, aplikasikan lebih ringan di bagian dalam bibir."],
+  caution:["Hindari penggunaan jika bibir sedang luka atau meradang.","Jaga agar produk tidak terkena langsung ke dalam mulut secara berlebihan.","Hentikan pemakaian jika muncul iritasi atau pembengkakan pada bibir."]},
+
+  {id:26,name:"Somethinc Holyshield UV Watery SPF 50+ PA++++",price:89000,originalPrice:119000,category:"skincare",subcategory:"sunscreen",badge:"Best Seller",image:"somethinc-sunscreen.jpg",range:"Skincare",description:"Sunscreen gel 5-in-1 dengan SPF 50+ PA++++ yang melindungi dari UVA, UVB, polusi, blue light, dan infrared. Tekstur watery cooling sensation, no white cast, bebas alkohol.",features:["SPF 50+ PA++++ 5-in-1 protection","Watery cooling sensation","No white cast & non-comedogenic","Dermatologist tested, BPOM certified"],
+  howto:["Aplikasikan sebagai langkah terakhir skincare pagi hari, sebelum makeup.","Gunakan dua ruas jari sunscreen untuk seluruh wajah dan leher.","Aplikasikan 15 menit sebelum terpapar sinar matahari.","Reapply setiap 2 jam terutama saat beraktivitas di luar ruangan."],
+  caution:["Hindari area mata langsung — jika terkena bilas segera dengan air bersih.","Meski non-comedogenic, lakukan patch test jika kulit sangat sensitif atau acne-prone.","Jangan skip sunscreen meski cuaca mendung karena sinar UV tetap ada.","Untuk ibu hamil dan menyusui, konsultasikan dengan dokter terlebih dahulu."]},
+
+  {id:27,name:"Pixy 4Beauty Benefits Concealing Base",price:42000,originalPrice:null,category:"makeup",subcategory:"concealer",badge:"New",image:"pixy-concealing-base.jpg",range:"Makeup",description:"Concealing base multifungsi dengan 4 manfaat: meratakan warna kulit, menyamarkan noda, melembapkan, dan melindungi kulit sebagai base makeup yang sempurna.",features:["4-in-1 beauty benefits","Concealing + moisturizing","Perfect makeup base","Formula ringan & nyaman"],
+  howto:["Gunakan sebelum foundation atau bedak sebagai base makeup.","Aplikasikan tipis-tipis ke seluruh wajah menggunakan jari atau sponge.","Fokuskan pada area yang perlu penyamaran seperti lingkar hitam atau noda.","Lanjutkan dengan bedak atau foundation untuk coverage yang lebih sempurna."],
+  caution:["Untuk kulit sangat sensitif, lakukan patch test di area kecil terlebih dahulu.","Hindari area mata jika tidak diformulasikan khusus untuk area tersebut.","Simpan di tempat sejuk dan kering — jangan terpapar suhu panas berlebih."]},
+
+  {id:28,name:"Focallure Uptown Girls Eyeshadow Palette",price:75000,originalPrice:99000,category:"makeup",subcategory:"eyeshadow",badge:"New",image:"focallure-eyeshadow-palette.jpg",range:"Makeup",description:"Palette eyeshadow 9 warna dengan tone nude-warm yang versatile. Kombinasi shimmer dan matte untuk tampilan sehari-hari hingga evening glam.",features:["9 warna nude-warm tone","Shimmer & matte finish","Pigmen tinggi & blendable","Dilengkapi aplikator brush"],
+  howto:["Gunakan warna terang/matte di seluruh kelopak sebagai base.","Aplikasikan warna medium di lipatan kelopak untuk dimensi.","Tambahkan warna shimmer di tengah kelopak untuk efek glam.","Blend semua warna dengan brush agar transisi warna halus dan natural."],
+  caution:["Hindari kontak langsung dengan mata — jika terkena bilas segera dengan air bersih.","Jangan digunakan jika mata sedang meradang atau iritasi.","Tutup rapat setelah digunakan agar produk tidak kering.","Bersihkan brush secara rutin untuk menjaga kebersihan dan mencegah infeksi mata."]}
+];
+let cart=[];
+let wishlist=[];
+let selectedCartItems=new Set(),orders=[];
+// Load data sesuai akun yang sedang login
+(function initUserData(){
+  const saved=store.get('tokoku_user');
+  if(saved&&saved.email){
+    cart=store.get(`tokoku_cart_${saved.email}`)||[];
+    wishlist=store.get(`tokoku_wish_${saved.email}`)||[];
+  }
+})();
+
+// Demo orders
+const demoOrders=[
+  {id:'TKU-2026-001',items:[{id:1,name:'Tote Bag Premium Canvas',image:'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80',price:299000,quantity:1}],total:299000,date:'1 Maret 2026',status:'dikirim',courier:'SiCepat',trackingNo:'SC20260301ABC',estArrival:'3 Maret 2026'},
+  {id:'TKU-2026-002',items:[{id:2,name:'Minimalist Watch Rose Gold',image:'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80',price:899000,quantity:1},{id:10,name:'Silk Sleep Mask',image:'https://images.unsplash.com/photo-1631730359585-38a4935cbec4?w=400&q=80',price:145000,quantity:2}],total:1189000,date:'28 Feb 2026',status:'penilaian',courier:'J&T Express',trackingNo:'JT20260228XYZ',estArrival:'Sudah Diterima'},
+  {id:'TKU-2026-003',items:[{id:6,name:'Aromatherapy Diffuser',image:'https://images.unsplash.com/photo-1608501821300-4f99e58bba77?w=400&q=80',price:450000,quantity:1}],total:450000,date:'2 Maret 2026',status:'dikemas',courier:'JNE',trackingNo:'-',estArrival:'4–5 Maret 2026'},
+  {id:'TKU-2026-004',items:[{id:4,name:'Wireless Earbuds Pro',image:'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&q=80',price:799000,quantity:1}],total:799000,date:'2 Maret 2026',status:'belum-bayar',courier:'-',trackingNo:'-',estArrival:'Menunggu Pembayaran'}
+];
+
+const stepLabels=['Bayar','Dikemas','Dikirim','Diterima'];
+const stepIcons=['💳','📦','🚚','🏠'];
+const statusIndex={'belum-bayar':0,'dikemas':1,'dikirim':2,'penilaian':3};
+const statusEst={'belum-bayar':'Selesaikan pembayaran agar pesanan segera diproses','dikemas':'Produk sedang dikemas, estimasi kirim 1–2 hari kerja','dikirim':'Dalam perjalanan — cek nomor resi untuk posisi terkini','penilaian':'Pesanan sudah diterima — yuk beri penilaian produk!'};
+const statusLabel={'semua':'Semua Pesanan','belum-bayar':'Belum Bayar','dikemas':'Dikemas','dikirim':'Dikirim','penilaian':'Beri Penilaian'};
+
+// ===== DRAWER =====
+function openDrawer(){document.getElementById('mobileDrawer').classList.add('open');document.getElementById('drawerOverlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeDrawer(){document.getElementById('mobileDrawer').classList.remove('open');document.getElementById('drawerOverlay').classList.remove('open');document.body.style.overflow='';}
+
+// ===== PANEL SYSTEM =====
+let panelZ=500,_scrollY=0;
+function openPanel(id){
+  const el=document.getElementById('panel-'+id);
+  el.style.zIndex=++panelZ;
+  el.classList.add('open');
+  _scrollY=window.scrollY;
+  document.body.style.position='fixed';
+  document.body.style.top=`-${_scrollY}px`;
+  document.body.style.left='0';
+  document.body.style.right='0';
+  document.querySelector('.bottom-nav').style.display='none';
+  if(id==='cart')renderCart();
+  else if(id==='wishlist')renderWishlist();
+  else if(id==='account')renderAccount();
+  else if(id==='search')setTimeout(()=>document.getElementById('searchInput').focus(),150);
+}
+function closePanel(id){
+  document.getElementById('panel-'+id).classList.remove('open');
+  if(!document.querySelector('.panel.open')){
+    document.body.style.position='';
+    document.body.style.top='';
+    document.body.style.left='';
+    document.body.style.right='';
+    window.scrollTo({top:_scrollY,behavior:'instant'});
+    panelZ=500;
+    document.querySelector('.bottom-nav').style.display='flex';
+  }
+}
+
+// ===== UTILS =====
+function fmt(n){return n.toLocaleString('id-ID')}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function closeAllPanels(){
+  document.querySelectorAll('.panel.open').forEach(p=>p.classList.remove('open'));
+  document.body.style.position='';
+  document.body.style.top='';
+  document.body.style.left='';
+  document.body.style.right='';
+  window.scrollTo({top:_scrollY,behavior:'instant'});
+  panelZ=500;
+  document.querySelector('.bottom-nav').style.display='flex';
+}
+function closeShareMenus(){document.querySelectorAll('.share-dropdown.open').forEach(d=>d.classList.remove('open'));}
+function toggleShareMenu(id){
+  const el=document.getElementById('share-'+id);
+  const isOpen=el.classList.contains('open');
+  closeShareMenus();
+  if(!isOpen)el.classList.add('open');
+}
+function copyToClipboard(text){
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(()=>showToast('✓ Ter-copy! Sekarang buka WA dan tempel.')).catch(()=>fallbackCopy(text));
+  }else{fallbackCopy(text);}
+}
+function fallbackCopy(text){
+  const t=document.createElement('textarea');
+  t.value=text;t.style.position='fixed';t.style.left='-9999px';t.style.top='0';
+  t.setAttribute('readonly','');
+  document.body.appendChild(t);
+  t.focus();t.select();
+  try{document.execCommand('copy');showToast('✓ Ter-copy! Sekarang buka WA dan tempel.');}
+  catch{showToast('Gagal copy, coba lagi');}
+  document.body.removeChild(t);
+}
+function copyProductLink(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  const text=`🛍️ *${p.name}*\nHarga: Rp ${fmt(p.price)}\n\nCek produk ini di Glowstore!\nhttps://www.instagram.com/decsiha?igsh=aHM0dGZ4aDBkOGdt`;
+  closeShareMenus();
+  copyToClipboard(text);
+}
+function shareToWA(id){
+  const p=products.find(x=>x.id===id);if(!p)return;
+  const text=encodeURIComponent(`Hei! Lihat produk ini di Glowstore 🛍️\n\n*${p.name}*\nHarga: Rp ${fmt(p.price)}\n\nOrder di: https://www.instagram.com/decsiha?igsh=aHM0dGZ4aDBkOGdt`);
+  closeShareMenus();
+  window.open(`https://wa.me/?text=${text}`,'_blank');
+}
+function scrollToSection(id){
+  closeAllPanels();
+  setTimeout(()=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const top=el.getBoundingClientRect().top+window.scrollY-70;
+    window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+  },100);
+}
+
+// ===== PRODUCT CARD =====
+function productCard(p){
+  return `<div class="product-card" onclick="openProduct(${p.id})">
+    <div class="product-img-wrap">
+      <img class="product-img" src="${p.image}" alt="${p.name}" loading="lazy">
+      ${p.badge?`<span class="product-badge-tag">${p.badge}</span>`:''}
+    </div>
+    <div class="product-info">
+      <div class="product-range">${p.range}</div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-footer">
+        <div class="product-price">
+          ${p.originalPrice?`<span class="product-original">Rp ${fmt(p.originalPrice)}</span>`:''}
+          Rp ${fmt(p.price)}
+        </div>
+        <div class="product-actions">
+          <button class="beli-btn" onclick="event.stopPropagation();buyNow(${p.id})">Beli</button>
+          <button class="add-btn" id="ab-${p.id}" onclick="event.stopPropagation();addToCart(${p.id},this)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ===== PRODUCT DETAIL =====
+let currentProductId=null;
+function openProduct(id){
+  currentProductId=id;
+  const p=products.find(x=>x.id===id);if(!p)return;
+  const disc=p.originalPrice?Math.round((1-p.price/p.originalPrice)*100):0;
+  const inW=wishlist.includes(id);
+  document.getElementById('productPanelTitle').textContent=p.name;
+  document.getElementById('productContent').innerHTML=`
+  <div class="detail-layout">
+    <div><img class="detail-img" src="${p.image.replace('w=400','w=700')}" alt="${p.name}"></div>
+    <div>
+      <div class="detail-range">${p.range}</div>
+      <div class="detail-name">${p.name}</div>
+      <div class="detail-price-row">
+        <div class="detail-price">Rp ${fmt(p.price)}</div>
+        ${p.originalPrice?`<div class="detail-orig">Rp ${fmt(p.originalPrice)}</div>`:''}
+        ${disc?`<div class="detail-disc">-${disc}%</div>`:''}
+      </div>
+      <div class="detail-desc">${p.description}</div>
+      <div class="detail-features">${p.features.map(f=>`<div class="detail-feature"><span class="detail-feat-icon">✦</span><span>${f}</span></div>`).join('')}</div>
+      ${p.howto?`<div class="detail-section"><div class="detail-section-title">Cara Pakai</div><div class="detail-howto">${p.howto.map((s,i)=>`<div class="detail-howto-step"><span class="detail-step-num">${i+1}</span><span>${s}</span></div>`).join('')}</div></div>`:''}
+      ${p.caution?`<div class="detail-section"><div class="detail-section-title">⚠ Perhatian Penting</div><div class="detail-caution">${p.caution.map(c=>`<div class="detail-caution-item"><span class="detail-caution-icon">⚠️</span><span>${c}</span></div>`).join('')}</div></div>`:''}
+    </div>
+  </div>`;
+  document.getElementById('productActionsBar').innerHTML=`
+    <button class="detail-add" style="flex:1" onclick="addToCart(${id})">+ Keranjang</button>
+    <button class="detail-buy" style="flex:1" onclick="buyNow(${id})">Beli Sekarang</button>
+    <button class="detail-wish ${inW?'active':''}" id="dw-${id}" onclick="toggleWishlist(${id})">${inW?'♥':'♡'}</button>`;
+  openPanel('product');
+}
+
+// ===== ALL PRODUCTS =====
+const promoFilters={all:()=>products,sale:()=>products.filter(p=>p.badge==='Sale'),new:()=>products.filter(p=>p.badge==='New'),bestseller:()=>products.filter(p=>p.badge==='Best Seller')};
+function openAllProducts(filter,title){
+  document.getElementById('allProductsTitle').textContent=title||'Semua Produk';
+  document.getElementById('allProductsFilters').innerHTML='';
+  document.getElementById('allProductsGrid').innerHTML=(promoFilters[filter]||promoFilters.all)().map(productCard).join('');
+  openPanel('allproducts');
+}
+function switchAPFilter(k,btn){
+  document.querySelectorAll('#allProductsFilters .filter-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('allProductsGrid').innerHTML=(promoFilters[k]||promoFilters.all)().map(productCard).join('');
+}
+
+// ===== SUBCATEGORY =====
+const subcategories={
+  skincare:[
+    {key:'sunscreen',label:'Sunscreen',sub:'UV Protection',img:'thumb-sunscreen.jpg'},
+    {key:'serum',label:'Serum',sub:'Active Treatment',img:'thumb-serum.jpg'},
+    {key:'toner',label:'Toner & Mist',sub:'Hydration & Exfoliation',img:'thumb-toner.jpg'},
+    {key:'moisturizer',label:'Moisturizer',sub:'Daily Hydration',img:'thumb-moisturizer.jpg'},
+    {key:'toneup',label:'Tone Up',sub:'Brightening Cream',img:'sub-toneup.jpg'},
+    {key:'masker',label:'Clay Mask',sub:'Deep Cleansing',img:'thumb-clay-mask.jpg'},
+    {key:'cleanser',label:'Cleanser',sub:'Face Wash & Micellar',img:'thumb-cleanser.jpg'},
+    {key:'lip',label:'Lip Care',sub:'Lip Treatment',img:'thumb-lip-care.jpg'},
+  ],
+  makeup:[
+    {key:'lips',label:'Lip Color',sub:'Lip Cream & Lip Color',img:'thumb-lip-color.jpg'},
+    {key:'bedak',label:'Face Powder',sub:'Loose & Compact Powder',img:'thumb-bedak.jpg'},
+    {key:'blush',label:'Blush',sub:'Cheek Color',img:'thumb-blush.jpg'},
+    {key:'primer',label:'Primer',sub:'Base Makeup',img:'sub-primer.jpg'},
+    {key:'concealer',label:'Concealer',sub:'Concealing Base',img:'sub-concealer.jpg'},
+    {key:'alis',label:'Eyebrow',sub:'Brow Pencil & Gel',img:'thumb-eyebrow.jpg'},
+    {key:'maskara',label:'Mascara',sub:'Eye Lash',img:'sub-maskara.jpg'},
+    {key:'eyeshadow',label:'Eyeshadow',sub:'Eye Color Palette',img:'sub-eyeshadow.jpg'},
+    {key:'setting',label:'Setting Spray',sub:'Makeup Setting',img:'sub-setting-spray.jpg'},
+  ]
+};
+function openSubcategoryPanel(cat){
+  const title=cat==='skincare'?'Skincare':'Makeup';
+  document.getElementById('subcategoryTitle').textContent=title;
+  const backBtn=document.getElementById('subcategoryBackBtn');
+  backBtn.textContent='← Kategori';
+  backBtn.onclick=()=>closePanel('subcategory');
+  const list=subcategories[cat]||[];
+  document.getElementById('subcategoryGrid').innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding:16px;max-width:900px;margin:0 auto">`+list.map(s=>{
+    const count=products.filter(p=>p.subcategory===s.key).length;
+    return `<div class="cat-card" onclick="openProductsBySubcat('${s.key}','${s.label}','${cat}')">
+      <img class="cat-img" src="${s.img}" loading="lazy">
+      <div class="cat-overlay"></div>
+      <div class="cat-name">${s.label}<span class="cat-sub">${count} produk</span></div>
+    </div>`;
+  }).join('')+`</div>`;
+  openPanel('subcategory');
+}
+function openProductsBySubcat(subcat,label,cat){
+  const parentTitle=cat==='skincare'?'Skincare':'Makeup';
+  const list=products.filter(p=>p.subcategory===subcat);
+  document.getElementById('categoryTitle').textContent=label;
+  const backBtn=document.getElementById('panel-category').querySelector('.panel-back');
+  backBtn.textContent=`← ${parentTitle}`;
+  backBtn.onclick=()=>{closePanel('category');openPanel('subcategory');};
+  document.getElementById('categoryGrid').innerHTML=list.length?list.map(productCard).join(''):'<p style="padding:24px;text-align:center;color:#aaa">Produk segera hadir 🌸</p>';
+  openPanel('category');
+}
+function openCategoryPanel(cat,sub){
+  let list=products.filter(p=>p.category===cat);
+  if(!list.length)list=products;
+  document.getElementById('categoryTitle').textContent=sub||cat;
+  document.getElementById('panel-category').querySelector('.panel-back').onclick=()=>closePanel('category');
+  document.getElementById('categoryGrid').innerHTML=list.map(productCard).join('');
+  openPanel('category');
+}
+function openRangePanel(range){
+  let list=products.filter(p=>p.range===range);if(!list.length)list=products.slice(0,4);
+  document.getElementById('rangeTitle').textContent=`Range: ${range}`;
+  document.getElementById('rangeGrid').innerHTML=list.map(productCard).join('');
+  openPanel('range');
+}
+
+// ===== SEARCH =====
+function doSearch(q){
+  const hint=document.getElementById('searchHint');
+  const grid=document.getElementById('searchResultsGrid');
+  if(!q.trim()){hint.style.display='block';grid.innerHTML='';return;}
+  hint.style.display='none';
+  const res=products.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())||p.category.toLowerCase().includes(q.toLowerCase())||p.range.toLowerCase().includes(q.toLowerCase())||(p.description&&p.description.toLowerCase().includes(q.toLowerCase())));
+  grid.innerHTML=res.length?res.map(productCard).join(''):`<div style="grid-column:1/-1;text-align:center;padding:60px;color:#bbb">Produk "<strong>${q}</strong>" tidak ditemukan</div>`;
+}
+
+// ===== CART =====
+function cartKey(){return currentUser?`tokoku_cart_${currentUser.email}`:'tokoku_cart_guest';}
+function wishKey(){return currentUser?`tokoku_wish_${currentUser.email}`:'tokoku_wish_guest';}
+function saveCart(){store.set(cartKey(),cart);}
+function loadUserData(email){
+  cart=store.get(`tokoku_cart_${email}`)||[];
+  wishlist=store.get(`tokoku_wish_${email}`)||[];
+  selectedCartItems=new Set();
+  updateCartCount();
+}
+function addToCart(id,btn){
+  const p=products.find(x=>x.id===id);
+  const ex=cart.find(x=>x.id===id);
+  if(ex)ex.quantity++;else{cart.push({...p,quantity:1});selectedCartItems.add(id);}
+  updateCartCount();saveCart();showToast(`${p.name} ditambahkan ke keranjang`);
+  if(btn){btn.classList.add('added');btn.textContent='✓';setTimeout(()=>{btn.classList.remove('added');btn.textContent='+';},1500);}
+}
+function buyNow(id){
+  const p=products.find(x=>x.id===id);
+  const ex=cart.find(x=>x.id===id);
+  if(ex)ex.quantity++;else cart.push({...p,quantity:1});
+  selectedCartItems.clear();selectedCartItems.add(id);
+  saveCart();updateCartCount();openPanel('cart');showToast(`Siap checkout: ${p.name}`);
+}
+function updateCartCount(){
+  const n=cart.reduce((s,i)=>s+i.quantity,0);
+  document.getElementById('cartCount').textContent=n;
+}
+function renderCart(){
+  const el=document.getElementById('cartContent');
+  if(!cart.length){
+    el.innerHTML=`<div class="cart-empty-state"><div class="cart-empty-icon">🛒</div><p>Keranjang masih kosong</p><p style="font-size:0.8rem;margin-top:8px;color:#ccc">Yuk tambahkan produk favoritmu!</p></div>`;return;
+  }
+  [...selectedCartItems].forEach(id=>{if(!cart.find(x=>x.id===id))selectedCartItems.delete(id);});
+  const allSel=cart.every(x=>selectedCartItems.has(x.id));
+  const selItems=cart.filter(x=>selectedCartItems.has(x.id));
+  const selTotal=selItems.reduce((s,x)=>s+x.price*x.quantity,0);
+  const selQty=selItems.reduce((s,x)=>s+x.quantity,0);
+  el.innerHTML=`<div class="cart-layout">
+    <div>
+      <div class="cart-items-area">
+        <div class="cart-select-row">
+          <label class="cart-select-label"><input type="checkbox" class="cart-chk" ${allSel?'checked':''} onchange="toggleSelectAll(this.checked)" id="selectAllChk"> Pilih Semua (${cart.length})</label>
+          <span style="font-size:0.76rem;color:var(--sage)">${selItems.length} dipilih</span>
+        </div>
+        ${cart.map(item=>{const sel=selectedCartItems.has(item.id);return`<div class="cart-item ${sel?'':'deselected'}">
+          <input type="checkbox" class="cart-chk" ${sel?'checked':''} onchange="toggleItemSel(${item.id},this.checked)" style="margin-top:2px;flex-shrink:0">
+          <img class="cart-item-img" src="${item.image}" alt="${item.name}">
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">Rp ${fmt(item.price)}</div>
+            <div class="cart-item-qty"><button class="qty-btn" onclick="updateQty(${item.id},-1)">−</button><span style="font-size:0.9rem;min-width:20px;text-align:center">${item.quantity}</span><button class="qty-btn" onclick="updateQty(${item.id},1)">+</button></div>
+          </div>
+          <button class="cart-remove" onclick="removeCart(${item.id})">Hapus</button>
+        </div>`;}).join('')}
+      </div>
+    </div>
+    <div>
+      <div class="cart-summary-box">
+        <div class="cart-summary-title">Ringkasan Order</div>
+        <div class="summary-row"><span>Dipilih (${selQty} item)</span><span>Rp ${fmt(selTotal)}</span></div>
+        <div class="summary-total"><span>Total</span><span>Rp ${fmt(selTotal)}</span></div>
+        <div class="ig-note"><span style="font-size:1rem">📦</span><span class="ig-note-text">Isi data pengiriman, lalu pesan otomatis ter-copy dan IG DM terbuka.</span></div>
+        <button class="checkout-btn" onclick="checkout()">📩 Checkout via Instagram DM</button>
+      </div>
+    </div>
+  </div>`;
+  const allChk=document.getElementById('selectAllChk');
+  if(allChk){const some=cart.some(x=>selectedCartItems.has(x.id));allChk.indeterminate=some&&!allSel;}
+}
+function toggleSelectAll(ch){cart.forEach(x=>ch?selectedCartItems.add(x.id):selectedCartItems.delete(x.id));renderCart();}
+function toggleItemSel(id,ch){ch?selectedCartItems.add(id):selectedCartItems.delete(id);renderCart();}
+function updateQty(id,d){const i=cart.find(x=>x.id===id);if(!i)return;i.quantity+=d;if(i.quantity<=0)removeCart(id);else{saveCart();updateCartCount();renderCart();}}
+function removeCart(id){cart=cart.filter(x=>x.id!==id);selectedCartItems.delete(id);saveCart();updateCartCount();renderCart();showToast('Produk dihapus');}
+function checkout(){
+  const sel=cart.filter(x=>selectedCartItems.has(x.id));
+  if(!sel.length){showToast('Pilih dulu produk yang ingin di-checkout!');return;}
+  const total=sel.reduce((s,x)=>s+x.price*x.quantity,0);
+  // Tampilkan ringkasan order di modal
+  const summaryHTML=`<div class="modal-order-summary">
+    <div class="modal-order-summary-title">Ringkasan Pesanan</div>
+    ${sel.map(i=>`<div class="modal-order-row"><span>${i.name} x${i.quantity}</span><span>Rp ${fmt(i.price*i.quantity)}</span></div>`).join('')}
+    <div class="modal-order-total"><span>Total</span><span>Rp ${fmt(total)}</span></div>
+  </div>`;
+  document.getElementById('modalOrderSummary').innerHTML=summaryHTML;
+  // Bersihkan input sebelumnya
+  document.getElementById('coName').value='';
+  document.getElementById('coPhone').value='';
+  document.getElementById('coAddress').value='';
+  document.querySelectorAll('.modal-input').forEach(el=>el.classList.remove('error'));
+  // Buka modal
+  document.getElementById('checkoutModal').classList.add('open');
+}
+function closeCheckoutModal(e){
+  if(e&&e.target!==document.getElementById('checkoutModal'))return;
+  document.getElementById('checkoutModal').classList.remove('open');
+}
+function submitCheckout(){
+  const name=document.getElementById('coName').value.trim();
+  const phone=document.getElementById('coPhone').value.trim();
+  const address=document.getElementById('coAddress').value.trim();
+  // Validasi
+  let valid=true;
+  ['coName','coPhone','coAddress'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el.value.trim()){el.classList.add('error');valid=false;}
+    else el.classList.remove('error');
+  });
+  if(!valid){showToast('Mohon lengkapi semua data!');return;}
+  const sel=cart.filter(x=>selectedCartItems.has(x.id));
+  const total=sel.reduce((s,x)=>s+x.price*x.quantity,0);
+  const lines=sel.map(i=>`• ${i.name} (x${i.quantity}) — Rp ${fmt(i.price*i.quantity)}`).join('\n');
+  const msg=`Halo kak! Saya ingin order dari Glowstore 🛍️\n\n*Data Pembeli:*\nNama: ${name}\nHP: ${phone}\nAlamat: ${address}\n\n*Pesanan:*\n${lines}\n\n*TOTAL: Rp ${fmt(total)}*\n\nMohon konfirmasi stok dan info pembayarannya ya kak. Terima kasih! 🙏`;
+  // Copy ke clipboard
+  copyToClipboard(msg);
+  // Simpan order
+  const order={id:'TKU-'+Date.now(),items:sel.map(x=>({...x})),total,date:new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}),status:'belum-bayar',courier:'-',trackingNo:'-',estArrival:'Menunggu Konfirmasi'};
+  orders.push(order);
+  // Tutup modal & cart, kembali ke home, buka IG di tab baru
+  document.getElementById('checkoutModal').classList.remove('open');
+  cart=cart.filter(x=>!selectedCartItems.has(x.id));
+  selectedCartItems.clear();
+  saveCart();
+  updateCartCount();
+  closeAllPanels();
+  showToast('✓ Pesan ter-copy! Buka IG DM dan paste pesannya.');
+  const igWin=window.open('https://www.instagram.com/decsiha?igsh=aHM0dGZ4aDBkOGdt','_blank');
+  if(!igWin)window.location.href='https://www.instagram.com/decsiha?igsh=aHM0dGZ4aDBkOGdt';
+}
+
+// ===== WISHLIST =====
+function toggleWishlist(id){
+  if(wishlist.includes(id)){wishlist=wishlist.filter(x=>x!==id);showToast('Dihapus dari favorit');}
+  else{wishlist.push(id);showToast('Ditambahkan ke favorit');}
+  store.set(wishKey(),wishlist);
+  const b=document.getElementById('dw-'+id);
+  if(b){b.classList.toggle('active',wishlist.includes(id));b.textContent=wishlist.includes(id)?'♥':'♡';}
+}
+function renderWishlist(){
+  const el=document.getElementById('wishlistContent');
+  if(!wishlist.length){el.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:60px;color:#bbb"><p style="font-size:3rem;opacity:0.2">♡</p><p style="margin-top:12px">Belum ada favorit</p></div>`;return;}
+  el.innerHTML=wishlist.map(id=>{const p=products.find(x=>x.id===id);return p?productCard(p):'';}).join('');
+}
+
+// ===== ACCOUNT =====
+function renderAccount(){
+  const el=document.getElementById('accountContent');
+  const s=currentUser;
+  if(!s){
+    el.innerHTML=`<div style="text-align:center;padding:60px 20px"><p style="font-size:3rem;margin-bottom:16px">👤</p><p style="color:#aaa;margin-bottom:24px">Kamu belum masuk ke akun</p><button class="btn-primary" onclick="closePanel('account');showAuthScreen()">Masuk / Daftar</button></div>`;return;
+  }
+  const ini=s.name.charAt(0).toUpperCase();
+  const joined=new Date(s.createdAt).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  el.innerHTML=`
+  <div class="acc-profile-bar">
+    <div class="acc-avatar">${ini}</div>
+    <div><div class="acc-name">${s.name}</div><div class="acc-email">${s.email}</div><div class="acc-joined">Member sejak ${joined}</div></div>
+  </div>
+  <div class="acc-divider"></div>
+  <div class="acc-menu-group">
+    <div class="acc-menu-item" onclick="openWishlistFromAccount()"><span class="acc-menu-icon">♡</span><span class="acc-menu-label">Favorit Saya</span><span class="acc-menu-arrow">›</span></div>
+    <div class="acc-menu-item" onclick="openInfoPanel('faq')"><span class="acc-menu-icon">❓</span><span class="acc-menu-label">Bantuan & FAQ</span><span class="acc-menu-arrow">›</span></div>
+    <div class="acc-menu-item" onclick="openInfoPanel('contact')"><span class="acc-menu-icon">📬</span><span class="acc-menu-label">Hubungi Kami</span><span class="acc-menu-arrow">›</span></div>
+    <div class="acc-menu-item" onclick="openInfoPanel('privacy')"><span class="acc-menu-icon">🔒</span><span class="acc-menu-label">Kebijakan Privasi</span><span class="acc-menu-arrow">›</span></div>
+  </div>
+  <div class="acc-divider"></div>
+  <div class="acc-menu-group">
+    <div class="acc-menu-item danger" onclick="logout()"><span class="acc-menu-icon">🚪</span><span class="acc-menu-label">Keluar dari Akun</span><span class="acc-menu-arrow">›</span></div>
+  </div>`;
+}
+function openWishlistFromAccount(){
+  openPanel('wishlist');
+}
+
+// ===== ORDER PROGRESS =====
+function renderOrderProgress(status){
+  const cur=statusIndex[status]??0;
+  let html='<div class="order-progress">';
+  stepLabels.forEach((label,i)=>{
+    const isDone=i<cur,isActive=i===cur,cls=isDone?'done':isActive?'active':'';
+    if(i>0)html+=`<div class="order-progress-connector ${i<=cur?'done':''}"></div>`;
+    html+=`<div class="order-progress-step"><div class="ops-circle ${cls}">${isDone?'✓':stepIcons[i]}</div><div class="ops-label ${cls}">${label}</div></div>`;
+  });
+  html+='</div>';
+  html+=`<div class="order-est">✦ ${statusEst[status]||''}</div>`;
+  return html;
+}
+
+// ===== ORDERS PANEL =====
+function openOrdersPanel(status){
+  const allOrders=[...demoOrders,...orders];
+  const filtered=status==='semua'?allOrders:allOrders.filter(o=>o.status===status);
+  const tabs=['semua','belum-bayar','dikemas','dikirim','penilaian'];
+  const filterHTML=`<div class="orders-filter-wrap">${tabs.map(t=>`<button class="orders-ftab ${t===status?'active':''}" onclick="openOrdersPanel('${t}')">${statusLabel[t]}</button>`).join('')}</div>`;
+  const el=document.getElementById('ordersContent');
+  if(!filtered.length){
+    el.innerHTML=filterHTML+`<div class="orders-empty"><p style="font-size:2.5rem;opacity:0.18;margin-bottom:14px">📭</p><p style="font-size:0.88rem">Tidak ada pesanan di sini</p></div>`;
+  }else{
+    el.innerHTML=filterHTML+filtered.map(order=>{
+      const courierBlock=order.courier!=='-'?`<div class="order-courier-box" style="margin:8px 14px 0"><span style="font-size:1rem">🚚</span><div style="flex:1"><div class="ocb-label">Kurir</div><div class="ocb-val">${order.courier} — <span style="color:#888;font-weight:400">${order.trackingNo}</span></div></div><div style="text-align:right"><div class="ocb-label">Est.</div><div style="font-size:0.76rem;font-weight:600;color:var(--green)">${order.estArrival}</div></div></div>`:'';
+      return`<div class="order-card">
+        <div class="order-card-header"><div><div class="order-id">${order.id}</div><div class="order-date">${order.date}</div></div><span class="order-status-badge ${order.status}">${statusLabel[order.status]||order.status}</span></div>
+        ${renderOrderProgress(order.status)}
+        <div>${order.items.map(item=>`<div class="order-item-row"><img class="order-item-img" src="${item.image}" alt="${item.name}"><div style="flex:1;min-width:0"><div class="order-item-name">${item.name}</div><div class="order-item-qty">x${item.quantity}</div></div><div class="order-item-price">Rp ${fmt(item.price*item.quantity)}</div></div>`).join('')}</div>
+        ${courierBlock}
+        <div class="order-total-row"><span>Total Pesanan</span><span>Rp ${fmt(order.total)}</span></div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('ordersPanelTitle').textContent=statusLabel[status]||'Pesanan';
+  openPanel('orders');
+}
+
+// ===== INFO PANEL =====
+const infoData={
+  eco:{icon:'🌿',title:'Eco Friendly',body:`<span class="info-tag">Lingkungan</span><p>Seluruh produk Glowstore dipilih dengan mempertimbangkan dampak lingkungan. Kami bermitra dengan pengrajin lokal yang menggunakan bahan ramah lingkungan.</p><h4>Komitmen Kami</h4><ul><li>Kemasan 100% daur ulang</li><li>200+ pengrajin lokal Indonesia</li><li>Target karbon netral 2028</li><li>Material bersertifikat FSC dan GOTS</li></ul>`},
+  shipping:{icon:'🚚',title:'Pengiriman Cepat',body:`<span class="info-tag">Logistik</span><h4>Estimasi Pengiriman</h4><ul><li>Jabodetabek: 1 hari kerja</li><li>Pulau Jawa: 1-2 hari kerja</li><li>Luar Jawa: 2-5 hari kerja</li><li>Papua & Kepulauan: 5-7 hari kerja</li></ul><h4>Gratis Ongkir</h4><ul><li>Gratis ongkir pembelian ≥ Rp 500.000</li><li>Mitra: JNE, J&T, SiCepat, Grab Express</li></ul>`},
+  quality:{icon:'⭐',title:'Kualitas Premium',body:`<span class="info-tag">Kualitas</span><p>Setiap produk melewati quality control ketat.</p><h4>Garansi & Retur</h4><ul><li>Garansi 30 hari sejak penerimaan</li><li>Retur gratis produk cacat</li><li>Refund 3-5 hari kerja</li></ul>`},
+  about:{icon:'🏪',title:'Tentang Glowstore',body:`<span class="info-tag">Perusahaan</span><p>Glowstore didirikan 2021 sebagai platform belanja produk natural dan handmade Indonesia.</p><h4>Angka Glowstore</h4><ul><li>500+ produk pilihan</li><li>100.000+ pelanggan setia</li><li>4.9/5 rating kepuasan</li></ul>`},
+
+  blog:{icon:'✍️',title:'Blog & Inspirasi',body:`<span class="info-tag">Konten</span><h4>Artikel Terpopuler</h4><ul><li>🌿 10 Cara Hidup Minimalis di 2026</li><li>🏡 Dekorasi Rumah Biophilic</li><li>👜 Panduan Memilih Tas Kanvas</li></ul>`},
+  faq:{icon:'❓',title:'FAQ',body:`<span class="info-tag">Bantuan</span><h4>Pemesanan</h4><ul><li>Tambahkan ke keranjang, pilih item, order via Instagram DM.</li></ul><h4>Pembayaran</h4><ul><li>OVO, DANA, GoPay, Transfer Bank, COD</li><li>Cicilan 0% ≥ Rp 1.000.000</li></ul><h4>Retur & Refund</h4><ul><li>Retur 30 hari, refund 3-5 hari kerja</li></ul>`},
+  contact:{icon:'📬',title:'Hubungi Kami',body:`<span class="info-tag">Customer Service</span><p>Tim kami siap membantu 07.00–23.00 WIB.</p><div class="info-contact-row"><div class="info-contact-icon">💬</div><div><div class="info-contact-label">WhatsApp</div><div class="info-contact-val">+62 882-1131-5440</div></div></div><div class="info-contact-row"><div class="info-contact-icon">📸</div><div><div class="info-contact-label">Instagram</div><div class="info-contact-val"><a href="https://www.instagram.com/decsiha?igsh=aHM0dGZ4aDBkOGdt" target="_blank" style="color:var(--green)">@decsiha</a></div></div></div>`},
+  privacy:{icon:'🔒',title:'Kebijakan Privasi',body:`<span class="info-tag">Privasi</span><p>Glowstore melindungi data pribadi sesuai UU PDP No. 27/2022. Seluruh transaksi dienkripsi SSL 256-bit.</p>`},
+  terms:{icon:'📋',title:'Syarat & Ketentuan',body:`<span class="info-tag">Legal</span><h4>Ketentuan</h4><ul><li>Pengguna minimal 17 tahun</li><li>Satu akun per pengguna</li><li>Harga sudah termasuk PPN 11%</li></ul>`}
+};
+function openInfoPanel(key){
+  const d=infoData[key];if(!d)return;
+  document.getElementById('infoPanelTitle').textContent=d.title;
+  document.getElementById('infoContent').innerHTML=`<div class="info-icon">${d.icon}</div><div class="info-title">${d.title}</div><div class="info-body">${d.body}</div>`;
+  openPanel('info');
+}
+
+// ===== AUTH (GUEST MODE) =====
+// Safe storage — tetap jalan meski localStorage diblokir (file Downloads)
+let registeredUsers=store.get('tokoku_users')||[];
+let currentUser=store.get('tokoku_user')||null;
+function updateNavUser(user){
+  const av=document.getElementById('navAvatar');
+  const nm=document.getElementById('navUserName');
+  if(user){
+    av.textContent=user.name.charAt(0).toUpperCase();av.style.fontSize='0.85rem';
+    nm.textContent=user.name.split(' ')[0];
+  }else{
+    av.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>`;
+    nm.textContent='Akun';
+  }
+}
+function switchAuthTab(tab){
+  document.getElementById('tabMasuk').classList.toggle('active', tab==='masuk');
+  document.getElementById('tabDaftar').classList.toggle('active', tab==='daftar');
+  document.getElementById('formMasuk').style.display = tab==='masuk'?'flex':'none';
+  document.getElementById('formDaftar').style.display = tab==='daftar'?'flex':'none';
+  document.getElementById('loginError').style.display='none';
+  document.getElementById('regError').style.display='none';
+}
+function handleLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPassword').value;
+  const err=document.getElementById('loginError');
+  if(!email||!pass){err.textContent='Email dan password wajib diisi.';err.style.display='block';return;}
+  if(!/\S+@\S+\.\S+/.test(email)){err.textContent='Format email tidak valid.';err.style.display='block';return;}
+  const user=registeredUsers.find(u=>u.email===email&&u.password===pass);
+  if(!user){err.textContent='Email atau password salah.';err.style.display='block';return;}
+  err.style.display='none';
+  loginSuccess(user.name, email);
+}
+function handleRegister(){
+  const name=document.getElementById('regName').value.trim();
+  const email=document.getElementById('regEmail').value.trim();
+  const pass=document.getElementById('regPassword').value;
+  const err=document.getElementById('regError');
+  const showErr=(msg)=>{err.textContent=msg;err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});};
+  if(!name){showErr('Nama lengkap wajib diisi.');return;}
+  if(!email){showErr('Email wajib diisi.');return;}
+  if(!/\S+@\S+\.\S+/.test(email)){showErr('Format email tidak valid.');return;}
+  if(!pass||pass.length<6){showErr('Password minimal 6 karakter.');return;}
+  if(registeredUsers.find(u=>u.email===email)){showErr('Email sudah terdaftar. Silakan masuk.');return;}
+  registeredUsers.push({name,email,password:pass});
+  store.set('tokoku_users',registeredUsers);
+  err.style.display='none';
+  loginSuccess(name,email);
+}
+function loginSuccess(name, email){
+  currentUser={name,email};
+  store.set('tokoku_user',currentUser);
+  loadUserData(email);
+  document.getElementById('authSuccessTitle').textContent=`Hai, ${name}! 🌸`;
+  document.getElementById('authSuccessSub').textContent='Selamat berbelanja di Glowstore!';
+  document.getElementById('authSuccess').classList.add('show');
+  setTimeout(()=>{
+    document.getElementById('authSuccess').classList.remove('show');
+    document.getElementById('authScreen').classList.add('hidden');
+    document.body.style.overflow='';
+    updateNavUser(currentUser);
+  },1800);
+}
+function showAuthScreen(){
+  const screen=document.getElementById('authScreen');
+  screen.classList.remove('hidden');
+  document.getElementById('authSuccess').classList.remove('show');
+  document.getElementById('loginEmail').value='';
+  document.getElementById('loginPassword').value='';
+  document.getElementById('regName').value='';
+  document.getElementById('regEmail').value='';
+  document.getElementById('regPassword').value='';
+  document.getElementById('loginError').style.display='none';
+  document.getElementById('loginError').style.color='';
+  document.getElementById('regError').style.display='none';
+  switchAuthTab(registeredUsers.length?'masuk':'daftar');
+}
+function logout(){
+  saveCart();
+  store.set(wishKey(),wishlist);
+  currentUser=null;
+  store.del('tokoku_user');
+  cart=[];wishlist=[];selectedCartItems.clear();
+  updateCartCount();updateNavUser(null);
+  document.querySelectorAll('.panel.open').forEach(p=>p.classList.remove('open'));
+  document.body.style.position='';document.body.style.top='';document.body.style.left='';document.body.style.right='';
+  window.scrollTo({top:0,behavior:'instant'});panelZ=500;
+  document.querySelector('.bottom-nav').style.display='flex';
+  showAuthScreen();
+}
+
+// ===== HERO CAROUSEL =====
+const heroSlides=[
+  {pid:11,img:'onlyou-sunscreen.jpg',label:'Hemat 24%',sub:'BEST SELLER • SKINCARE',price:'Rp 75.000',tag:'Best Seller'},
+  {pid:16,img:'hero-best-seller.jpg',label:'Hemat 25%',sub:'BEST SELLER • MAKEUP',price:'Rp 59.000',tag:'Best Seller'},
+  {pid:19,img:'hero-flash-sale.jpg',label:'Hemat 24%',sub:'SALE • SKINCARE',price:'Rp 125.000',tag:'Sale'},
+  {pid:20,img:'hero-new-arrival.jpg',label:'Produk Baru',sub:'NEW • SKINCARE',price:'Rp 99.000',tag:'New'},
+  {pid:1,img:'wardah-cream-blush.jpg',label:'Hemat 23%',sub:'BEST SELLER • MAKEUP',price:'Rp 89.000',tag:'Best Seller'},
+];
+let curSlide=0,carTimer=null,dragX=0,isDrag=false,isPaused=false;
+function buildCarousel(){
+  const sl=document.getElementById('heroSlides');
+  const dt=document.getElementById('carouselDots');
+  sl.innerHTML=heroSlides.map(s=>`<div class="hero-slide"><img class="hero-img" src="${s.img}" alt="${s.label}"><div class="hero-badge" onclick="openProduct(${s.pid})"><div class="badge-title">${s.label}</div><div class="badge-sub">${s.sub}</div><div class="badge-price">${s.price}</div></div><div class="hero-label">${s.tag}</div></div>`).join('');
+  dt.innerHTML=heroSlides.map((_,i)=>`<button class="carousel-dot${i===0?' active':''}" onclick="goSlide(${i})"></button>`).join('');
+  const c=document.getElementById('heroCarousel');
+  c.addEventListener('touchstart',e=>{dragX=e.touches[0].clientX;},{passive:true});
+  c.addEventListener('touchend',e=>{const d=dragX-e.changedTouches[0].clientX;if(Math.abs(d)>40)carouselMove(d>0?1:-1);},{passive:true});
+  c.addEventListener('mousedown',e=>{isDrag=true;dragX=e.clientX;sl.style.transition='none';});
+  c.addEventListener('mouseup',e=>{if(!isDrag)return;isDrag=false;sl.style.transition='transform 0.55s cubic-bezier(0.4,0,0.2,1)';const d=dragX-e.clientX;if(Math.abs(d)>40)carouselMove(d>0?1:-1);});
+  c.addEventListener('mouseleave',()=>{if(isDrag){isDrag=false;sl.style.transition='transform 0.55s cubic-bezier(0.4,0,0.2,1)';}isPaused=false;});
+  c.addEventListener('mouseenter',()=>isPaused=true);
+  goSlide(0);
+  carTimer=setInterval(()=>{if(!isPaused)goSlide(curSlide+1);},3500);
+}
+function goSlide(idx){
+  curSlide=(idx+heroSlides.length)%heroSlides.length;
+  const sl=document.getElementById('heroSlides');
+  const w=document.querySelector('.hero-slide')?.offsetWidth||0;
+  sl.style.transform=`translateX(-${curSlide*w}px)`;
+  document.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===curSlide));
+  document.querySelectorAll('.hero-badge').forEach((b,i)=>{
+    b.style.transition='none';b.style.opacity='0';b.style.transform='translateX(-20px)';
+    if(i===curSlide)setTimeout(()=>{b.style.transition='opacity 0.4s ease,transform 0.4s ease';b.style.opacity='1';b.style.transform='translateX(0)';},200);
+  });
+}
+function carouselMove(dir){goSlide(curSlide+dir);clearInterval(carTimer);carTimer=setInterval(()=>{if(!isPaused)goSlide(curSlide+1);},3500);}
+window.addEventListener('resize',()=>{
+  const sl=document.getElementById('heroSlides');if(!sl)return;
+  const w=document.querySelector('.hero-slide')?.offsetWidth||0;
+  sl.style.transition='none';sl.style.transform=`translateX(-${curSlide*w}px)`;
+  setTimeout(()=>sl&&(sl.style.transition='transform 0.55s cubic-bezier(0.4,0,0.2,1)'),50);
+});
+
+// ===== INIT =====
+document.addEventListener('contextmenu',e=>{if(e.target.tagName==='IMG')e.preventDefault();});
+document.addEventListener('click',e=>{if(!e.target.closest('.share-btn')&&!e.target.closest('.share-dropdown'))closeShareMenus();});
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('homeGrid').innerHTML=products.slice(0,8).map(productCard).join('');
+  // Restore cart — pastikan data produk selalu fresh dari products array
+  cart=cart.map(c=>{const p=products.find(x=>x.id===c.id);return p?{...p,quantity:c.quantity}:null;}).filter(Boolean);
+  saveCart();
+  updateCartCount();
+  // Auto-login kalau ada sesi tersimpan
+  if(currentUser){
+    updateNavUser(currentUser);
+    document.getElementById('authScreen').classList.add('hidden');
+  }
+});
+
+// ===== PROMO HERO CAROUSEL =====
+(function(){
+  const track=document.getElementById('promoHeroTrack');
+  const wrap=document.getElementById('promoHeroWrap');
+  const dotsEl=document.getElementById('promoHeroDots');
+  if(!track||!wrap||!dotsEl)return;
+  const slides=track.querySelectorAll('.promo-hero-slide');
+  const total=slides.length;
+  let cur=0,timer,dragStartX=0,isDragging=false,paused=false;
+  dotsEl.innerHTML=Array.from({length:total},(_,i)=>`<button class="carousel-dot${i===0?' active':''}" onclick="promoHeroGo(${i})"></button>`).join('');
+  window.promoHeroGo=function(idx){
+    cur=(idx+total)%total;
+    window._pHCur=cur;
+    const w=slides[0].offsetWidth||wrap.offsetWidth;
+    track.style.transform=`translateX(-${cur*w}px)`;
+    dotsEl.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+  };
+  function next(){promoHeroGo(cur+1);}
+  timer=setInterval(()=>{if(!paused)next();},3500);
+  wrap.addEventListener('touchstart',e=>{dragStartX=e.touches[0].clientX;},{passive:true});
+  wrap.addEventListener('touchend',e=>{const d=dragStartX-e.changedTouches[0].clientX;if(Math.abs(d)>40){promoHeroGo(cur+(d>0?1:-1));clearInterval(timer);timer=setInterval(()=>{if(!paused)next();},3500);}},{passive:true});
+  wrap.addEventListener('mousedown',e=>{isDragging=true;dragStartX=e.clientX;track.style.transition='none';});
+  wrap.addEventListener('mouseup',e=>{if(!isDragging)return;isDragging=false;track.style.transition='transform 0.55s cubic-bezier(0.4,0,0.2,1)';const d=dragStartX-e.clientX;if(Math.abs(d)>40){promoHeroGo(cur+(d>0?1:-1));clearInterval(timer);timer=setInterval(()=>{if(!paused)next();},3500);}});
+  wrap.addEventListener('mouseleave',()=>{if(isDragging){isDragging=false;track.style.transition='transform 0.55s cubic-bezier(0.4,0,0.2,1)';}});
+  window.addEventListener('resize',()=>{track.style.transition='none';const w=slides[0].offsetWidth||wrap.offsetWidth;track.style.transform=`translateX(-${cur*w}px)`;setTimeout(()=>track.style.transition='transform 0.55s cubic-bezier(0.4,0,0.2,1)',50);});
+})();
+</script>
+</body>
+</html>
